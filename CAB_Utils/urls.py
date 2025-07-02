@@ -15,8 +15,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from core import views as core_views
+from seat_signal import views as ss_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', core_views.index, name='index'),
+    path('seat-signal/', ss_views.ss_view, name='seat-signal')
+
+    # path('prereq-path/' include(prereq_path.urls')) when theres another app
 ]
