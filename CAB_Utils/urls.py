@@ -16,23 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from core import views as core_views
-from seat_signal import views as ss_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
-    # core: users + homepage
-    path('', core_views.index, name='index'),
-    path('profile/', core_views.profile_view, name='profile'),
-    path('register/', core_views.register_view, name='register'),
-    path('login/', core_views.login_view, name='login'),
-    path('logout/', core_views.logout_view, name='logout'),
-
-    # utility apps
-    path('seat-signal/', ss_views.ss_view, name='seat-signal')
-    # path('prereq-path/' include(prereq_path.urls')) when theres another app
-
-    # API
-
+    path('', include('core.urls')), # core: implements users + homepage. houses shared layout
+    path('', include('seat_signal.urls')) # course seat signal app
 ]

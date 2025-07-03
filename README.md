@@ -1,6 +1,5 @@
 TBD. currently using readme to plan
 
--do users/logins next
 -implement an ugly version of seat signal
 -navigation bar
 -react lectures
@@ -8,7 +7,7 @@ TBD. currently using readme to plan
 things i dont want to forget about when im polishing
 -validate phone numbers server+client side, probably with preexisting packages
 -encrypt passwords
--login format can mimic an older project
+-login ui format could mimic an older project
 -could probably put login/register under the same html file, use js and render context
 <!-- Later, let users edit password and phone number in the same format as registration. fix username tho
     <form action="{% url 'update_user' %}" method="POST">

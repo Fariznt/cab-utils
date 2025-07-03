@@ -1,0 +1,9 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.ss_view, name='seat-signal'),
+
+    # API
+    
+]
