@@ -104,6 +104,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Set custom user model
+AUTH_USER_MODEL = 'core.User'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

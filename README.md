@@ -6,6 +6,18 @@ TBD. currently using readme to plan
 -react lectures
 
 things i dont want to forget about when im polishing
--validate phone numbers, probably with preexisting packages
+-validate phone numbers server+client side, probably with preexisting packages
 -encrypt passwords
 -login format can mimic an older project
+-could probably put login/register under the same html file, use js and render context
+<!-- Later, let users edit password and phone number in the same format as registration. fix username tho
+    <form action="{% url 'update_user' %}" method="POST">
+        {% csrf_token %}
+        Username:
+        <input type="text" name="username" placeholder="e.g. CPax">
+        Password:
+        <input type="password" name="password" placeholder="e.g. 12345 (jk)">
+        Phone number:
+        <input type="tel" name="phone-number">
+        <input type="submit" value="Login">
+    </form> -->

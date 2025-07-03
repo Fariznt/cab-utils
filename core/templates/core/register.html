@@ -7,12 +7,16 @@
         </div>
         
     {% endif %}
-    <form action="{% url 'login' %}" method="POST">
+    <form action="{% url 'register' %}" method="POST">
         {% csrf_token %}
         Username:
         <input type="text" name="username" placeholder="e.g. CPax">
         Password:
         <input type="password" name="password" placeholder="e.g. 12345 (jk)">
+        Confirm Password:
+        <input type="password" name="confirm_password" placeholder="dont actually use 12345">
+        Phone number:
+        <input type="tel" name="phone_number">
         <input type="submit" value="Login">
     </form>
 {% endblock %}
