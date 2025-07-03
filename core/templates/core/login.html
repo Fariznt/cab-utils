@@ -1,0 +1,17 @@
+{% extends "core/layout.html" %}
+
+{% block body %}
+    {% if message %}
+        <div id="login-msg">
+            {{ message }}
+        </div>
+        
+    {% endif %}
+    <form action="{% url 'login' %}" method="POST">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="e.g. CPax">
+        <input type="password" name="password" placeholder="e.g. 12345 (jk)">
+        <input type="tel" name="phone_number" placeholder="TBD">
+        <input type="submit" value="Login">
+    </form>
+{% endblock %}

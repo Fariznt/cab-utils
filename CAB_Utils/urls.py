@@ -21,8 +21,18 @@ from seat_signal import views as ss_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', core_views.index, name='index'),
-    path('seat-signal/', ss_views.ss_view, name='seat-signal')
 
+    # core: users + homepage
+    path('', core_views.index, name='index'),
+    path('profile/', core_views.profile_view, name='profile'),
+    path('register/', core_views.register_view, name='register'),
+    path('login/', core_views.login_view, name='login'),
+    path('logout/', core_views.logout_view, name='logout'),
+
+    # utility apps
+    path('seat-signal/', ss_views.ss_view, name='seat-signal')
     # path('prereq-path/' include(prereq_path.urls')) when theres another app
+
+    # API
+
 ]
