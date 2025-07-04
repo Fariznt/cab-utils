@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
-    'seat_signal'
+    'seat_signal',
+    'background_task' # for seat signal polling the C@B API to check for open seats
 ]
 
 MIDDLEWARE = [
