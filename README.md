@@ -1,8 +1,10 @@
 TBD. currently using readme to plan
 
--implement an ugly version of seat signal
+-semester database creation code as part of a command in core/management/commands
+-implement an ugly version of seat signal, starting with seat_signal/views.watch_course triggering task.py with django-background-tasks
+    -do a basic frontend in js to get more experience w/ js basics. include array methods and async/await with fetch
+-react/ts lectures
 -navigation bar
--react lectures
 
 things i dont want to forget about when im polishing
 -validate phone numbers server+client side, probably with preexisting packages
