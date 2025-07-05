@@ -2,6 +2,9 @@ from background_task import background
 from background_task.models import Task
 import requests
 import json
+from twilio.rest import Client
+from twilio.twiml.voice_response import VoiceResponse
+from core.models import CourseSession
 
 # look at documentation to figure out django-background_tasks
 # TODO: error handling, exceptions, logging failures, etc.
@@ -34,5 +37,28 @@ def extract_seat_count(course_details: dict[str, any]) -> int:
 
 def send_signal(crn, number, contact_method) -> None:
     """Notifies the user (by text/call) of an open seat in the session they had SeatSignal watching"""
+    if contact_method == 'call':
+        # Create call voice message string
+        session = CourseSession.objects.get(crn=crn)
+        course_name = session.name
+        section = session.section
+        msg = (
+            f"Seat Signal has detected an open seat for {course_name} "
+            f"<break time='0.1s'/> section {section}."
+            "<break time='0.3s'/> Proceed to registration."
+        )
+        # Create call voice message
+        voice_resp = VoiceResponse()
+        voice_resp.pause(length=1.5)
+        voice_resp.say(msg, voice="alice")
+        # Create client & call
+        # client = Client(ACCOUNT_SID, AUTH_TOKEN)
+        # call = client.calls.create(
+        #     to="", 
+        #     from_="",
+        #     twiml = resp.to_xml()
+        # )
+
+    #do texting later
     pass # TBD
     
