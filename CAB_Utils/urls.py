@@ -20,5 +20,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')), # core: implements users + homepage. houses shared layout
-    path('', include('seat_signal.urls')) # course seat signal app
+    path('seat-signal/', include('seat_signal.urls')) # course seat signal app
 ]

@@ -25,5 +25,13 @@ things i dont want to forget about when im polishing
         <input type="submit" value="Login">
     </form> -->
 -let people restart it by text upon failure
-
+-especially for api users, need the service to be cancellable by text. smth like (gpt example):
+    def stop_my_task(request):
+    # filter by task name and, optionally, by your args
+    Task.objects.filter(
+        task_name='my_looping_task',
+        # Uncomment to match specific args:
+        # task_params__contains='"arg1_value"'
+    ).delete()
+    return HttpResponse("Stopped my_looping_task.")
 -privacy policy regarding phone numbers and passwords (not gauranteeing safety of data but gauranteeing it wont be deliberately sold)

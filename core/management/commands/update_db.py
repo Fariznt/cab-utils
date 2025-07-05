@@ -50,4 +50,5 @@ class Command(BaseCommand):
             new_session.save()
 
         self.stdout.write("Database update complete.")
+    print(CourseSession.objects.get(crn=18181).code)
         
