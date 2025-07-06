@@ -1,9 +1,14 @@
 TBD. currently using readme to plan
 
--implement an ugly version of seat signal, starting with seat_signal/views.watch_course triggering task.py with django-background-tasks
-    -do a basic frontend in js to get more experience w/ js basics. include array methods and async/await with fetch
--react/ts lectures
+-do a basic frontend in js for seat_signal to get more experience w/ js basics. include array methods and async/await with fetch. 
 -navigation bar
+-backend polishing
+
+unspecified time in future:
+-react/ts lectures
+-frontend polishing
+-unit testing
+
 
 for now, im deferring exposing a seat_signal API. it probably wont get used at least for a while, and its complicating my prototyping
 
@@ -35,3 +40,13 @@ things i dont want to forget about when im polishing
     ).delete()
     return HttpResponse("Stopped my_looping_task.")
 -privacy policy regarding phone numbers and passwords (not gauranteeing safety of data but gauranteeing it wont be deliberately sold)
+-prevent duplicate numbers when watching a seat
+-if i ship this fully into production for student use, i need backups for the database, plus figure moving databases in and out without
+    pushing sensitive info onto a public repo (scp? django commands?)
+-do to the way seat signal is written, need to verify only 1-1 relationship between users and numbers in db and in input validation
+    + 1 seat signal per user-session
+-when shipping into an actual web app on my vps, use either a multi-container set up that also launches process_tasks or set up honcho
+    for now im running python manage.my process_tasks with my app
+
+IMPORTANT README TO-INCLUDE INFO:
+"Want to extend my app? Don't forget to create a .env file and define your own values for..."

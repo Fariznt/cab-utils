@@ -1,3 +1,9 @@
 Django==5.2.4
 requests==2.32.4
-django-background-tasks==1.2.8
+
+# For SeatSignal contacting users by phone number
+django-background-tasks==1.2.8 # Running background API polling
+twilio==9.6.4 # calling/texting
+
+# For loading Twilio credentials from .env. This is sensitive info not made available to my public repo. Get your own. See README for details
+python-dotenv 1.1.1 

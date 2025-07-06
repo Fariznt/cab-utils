@@ -10,3 +10,4 @@ class CourseSession(models.Model):
     code = models.CharField(9)
     section = models.CharField(3)
     sem_id = models.CharField(6)
+    title = models.CharField()

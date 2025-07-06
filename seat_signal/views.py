@@ -9,7 +9,6 @@ def ss_view(request):
 
 # TODO: this function is written badly. prone to bugs. bad validation. not exposed as an API. redo later but get working first
 def watch_course(request):
-
     crn = request.POST['crn'] # course session identifier
     contact_method = request.POST['contact_method']
     # code = request.GET.get('code')xxx
@@ -47,6 +46,7 @@ def watch_course(request):
         new_seat_signal.save()
 
         number = user.phone_num
+
         watch_task(crn, number, contact_method)
         return JsonResponse({'status': 'success', 'message': 'Watching course, crn:' + crn})
     else:

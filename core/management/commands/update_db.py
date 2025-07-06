@@ -46,9 +46,8 @@ class Command(BaseCommand):
             crn = course_datum.get('crn')
             code = course_datum.get('code')
             section = course_datum.get('no')
-            new_session = CourseSession(crn=crn, code=code, section=section, sem_id=SEM_ID)
+            title = course_datum.get('title')
+            new_session = CourseSession(crn=crn, code=code, section=section, sem_id=SEM_ID, title = title)
             new_session.save()
 
-        self.stdout.write("Database update complete.")
-    print(CourseSession.objects.get(crn=18181).code)
-        
+        self.stdout.write("Database update complete.")        
