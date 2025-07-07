@@ -1,0 +1,14 @@
+.hero-header {
+  /* fill the viewport */
+  height: 100vh;
+  width: 100%;
+
+  /* background image settings */
+  background-image: url("https://cdn.discordapp.com/attachments/388721642722820096/1391653484713082910/reunion21-zoom-181.png?ex=686cadce&is=686b5c4e&hm=9b7dc7e0aed406741f5c0d237cc759055abef1f1d6195b820f32820d669e57b4&");
+  background-size: cover;
+  background-position: center;
+}
+
+.homepage-text {
+    background-color: #eeece7;
+}

@@ -1,5 +1,16 @@
 {% extends "core/layout.html" %}
+{% load static %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static '/core/index.css' %}">
+{% endblock %}
 
 {% block body %}
-    <strong>homepage!!! welcome {{ user }}</strong>
+    <header class="hero-header"></header>
+    <div class="homepage-text">
+        <strong>homepage!!! welcome {{ user }}</strong>
+        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    </div>
+    
+
 {% endblock %}

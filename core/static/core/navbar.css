@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+
+.navbar {
+  position: fixed;
+  width: 100%;
+  background-color: #000000be; 
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 1rem 1rem;
+  z-index: 1000;
+  gap: 1rem;
+}
+
+/* Top-left brand */ 
+.navbar-brand {
+  font-size: x-large
+}
+.brand-cab {
+    font-family: 'roboto', sans-serif
+
+}
+.brand-utilities {
+    font-family: 'comfortaa', sans-serif
+}
+
+/* Alignment */
+.navbar-apps {
+  margin-left: 0.5rem
+  
+}
+
+.navbar-users {
+  margin-left: auto;
+  margin-right: 0.5rem
+}
+
+/* Navigation bar buttons */
+.navbar a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 10px;
+  background-color: #7b0014a9;
+}
+
+.navbar a:hover {
+  background-color: #7b0015;
+}
+
