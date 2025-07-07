@@ -11,6 +11,8 @@ unspecified time in future:
 
 
 for now, im deferring exposing a seat_signal API. it probably wont get used at least for a while, and its complicating my prototyping
+for now, im deferring texting functionality (Due to cost on twilio), but want to keep the app extensible for texting as a signal method.
+    if i add texting, i should probably use voips for lower cost.
 
 things i dont want to forget about when im polishing
 -definitely want to do a tiny bit of unit testing at least on the API. MAYBE cb later for selenium if its particularly valuable
@@ -47,6 +49,9 @@ things i dont want to forget about when im polishing
     + 1 seat signal per user-session
 -when shipping into an actual web app on my vps, use either a multi-container set up that also launches process_tasks or set up honcho
     for now im running python manage.my process_tasks with my app
+-my number got labeled scam likely... might have to purchase another from twilio and/or get whitelisted by carrier
+-if this app scales to many more users, i should switch to something like telnyx that charges per-second. rn per-minute costs
+    are making this expensive.
 
 IMPORTANT README TO-INCLUDE INFO:
 "Want to extend my app? Don't forget to create a .env file and define your own values for..."
