@@ -12,18 +12,24 @@
   padding: 1rem 1rem;
   z-index: 1000;
   gap: 1rem;
+  top: 0
 }
 
 /* Top-left brand */ 
 .navbar-brand {
-  font-size: x-large
+  font-size: x-large;
+}
+.navbar-brand a:hover {
+  font-style: underline;
+  font-size: larger;
+  text-decoration-color: white;
 }
 .brand-cab {
-    font-family: 'roboto', sans-serif
-
+  font-family: 'roboto', sans-serif;
+  color: white;
 }
 .brand-utilities {
-    font-family: 'comfortaa', sans-serif
+  font-family: 'comfortaa', sans-serif
 }
 
 /* Alignment */
@@ -38,7 +44,7 @@
 }
 
 /* Navigation bar buttons */
-.navbar a {
+.navbar-apps a, .navbar-users a {
   color: white;
   text-decoration: none;
   font-weight: 500;
@@ -46,7 +52,7 @@
   background-color: #7b0014a9;
 }
 
-.navbar a:hover {
+.navbar-apps a:hover, .navbar-users a:hover {
   background-color: #7b0015;
 }
 

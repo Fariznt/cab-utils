@@ -1,22 +1,42 @@
 {% extends "core/layout.html" %}
+{% load static %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static '/core/profile.css' %}">
+{% endblock %}
 
 {% block body %}
-    {% if message %}
-        <div class="message">
-            {{ message }}
-        </div>
-        
-    {% endif %}
-    <form action="{% url 'register' %}" method="POST">
-        {% csrf_token %}
-        Username:
-        <input type="text" name="username" placeholder="e.g. CPax">
-        Password:
-        <input type="password" name="password" placeholder="e.g. 12345 (jk)">
-        Confirm Password:
-        <input type="password" name="confirm_password" placeholder="dont actually use 12345">
-        Phone number:
-        <input type="tel" name="phone_number">
-        <input type="submit" value="Register">
-    </form>
+<div class="profile-page">
+    <div class="profile-box">
+        {% if message %}
+            <div class="message">
+                {{ message }}
+            </div>
+            
+        {% endif %}
+        <form action="{% url 'register' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name-field">Username</label>
+                <input class="form-control" id="name-field" type="text" name="username" placeholder="e.g. CPax">
+            </div>
+            <div class="form-group">
+                <label for="password-field">Password</label>
+                <input class="form-control" id="password-field" type="password" name="password" placeholder="e.g. 12345 (jk)">
+                <small class="form-text text-muted">Do not use a password you've used elsewhere.</small>
+            </div>
+            <div class="form-group">
+                <label for="conf-password-field">Confirm Password</label>
+                <input class="form-control" id="conf-password-field" type="password" name="confirm_password" placeholder="dont actually use 12345">
+            </div>
+            <div class="form-group">
+                <label for="num-field">Phone Number</label>
+                <input class="form-control" id="num-field" type="tel" name="phone_number">
+                <small class="form-text text-muted">I will never share your phone number. Required for course seat notifications by call/text.</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+</div>
 {% endblock %}

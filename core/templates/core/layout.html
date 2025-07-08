@@ -13,12 +13,17 @@
     <body>
         <nav class="navbar">
             <div class="navbar-brand">
-                <strong class="brand-cab">COURSES @ BROWN</strong> <span class="brand-utilities">Utilities</span>
+                <a href="https://cab.brown.edu/" title="Quick link to C@B itself!">
+                    <strong class="brand-cab">COURSES @ BROWN</strong> 
+                </a>
+                <span class="brand-utilities">Utilities</span>
             </div>
             <div class="navbar-apps">
                 <a href="{% url 'index' %}">Home</a>
-                <a href="{% url 'seat-signal' %}">SeatSignal</a>
-                <a href="">PrereqMap</a>
+                <a title="Get notified by call when a course seat opens" href="{% url 'seat-signal' %}">SeatSignal</a>
+                <a title="Visualize prerequisites and quantify value" href="">PrereqMap</a>
+                <a title="Which semesters courses were offerred in the past" href="">Offering Patterns</a>
+                <a title="External site for course reviews" href="https://www.thecriticalreview.org/">Critical Review</a>
             </div>
             <div class="navbar-users">
                 {% if user.is_authenticated %}

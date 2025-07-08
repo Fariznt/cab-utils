@@ -4,9 +4,11 @@
   width: 100%;
 
   /* background image settings */
-  background-image: url("https://cdn.discordapp.com/attachments/388721642722820096/1391653484713082910/reunion21-zoom-181.png?ex=686cadce&is=686b5c4e&hm=9b7dc7e0aed406741f5c0d237cc759055abef1f1d6195b820f32820d669e57b4&");
+  background-image: url("https://cdn.discordapp.com/attachments/388721642722820096/1391657633655685120/ChatGPT_Image_Jul_7_2025_01_50_29_AM.png?ex=686cb1ab&is=686b602b&hm=739d11d6cc101c2d687da5fec1f9a43e53a38192a76955d37d4012eb4be6a392&");
   background-size: cover;
   background-position: center;
+
+  position: relative
 }
 
 .homepage-text {

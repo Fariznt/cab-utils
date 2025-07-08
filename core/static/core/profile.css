@@ -1,0 +1,49 @@
+body {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+.profile-page {
+    width: 100vw;
+    height: 100vh;
+    background-image: url("https://cdn.discordapp.com/attachments/388721642722820096/1391657633655685120/ChatGPT_Image_Jul_7_2025_01_50_29_AM.png?ex=686cb1ab&is=686b602b&hm=739d11d6cc101c2d687da5fec1f9a43e53a38192a76955d37d4012eb4be6a392&");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+}
+
+.profile-box {
+    max-width: 430px;
+    max-height: 500px;
+    margin: auto;
+    padding: 25px;
+    background-color: #000000d2;
+}
+
+.form-group label {
+    color: white
+}
+
+.form-group input {
+    background-color: #7b0014a9;
+    border: transparent
+}
+
+.form-group input::placeholder {
+    color: #c50021;
+}
+
+.form-group input:focus::placeholder {
+    color: transparent
+}
+
+.form-group input:focus {
+    color: #c50021;
+    border: #ff002b
+}
+
+.text-muted {
+    color:white
+}
