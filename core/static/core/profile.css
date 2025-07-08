@@ -94,6 +94,10 @@ body {
 }
 
 /* Helper Text */
+.message {
+    color: red
+}
+
 .text-muted {
     color: var(--text-main);
     font-size: 0.9rem;
@@ -115,6 +119,17 @@ body {
 .btn-primary:hover,
 .btn-primary:focus {
     background: #600010;
+}
+
+.edit-button {
+    margin-top: 2rem;
+    color: var(--brand-maroon);
+    border-color:  var(--brand-maroon);
+}
+
+.edit-button:hover {
+    background-color: #ac0d28;
+    border:#600010
 }
 
 /* ---------- Checkbox ---------- */

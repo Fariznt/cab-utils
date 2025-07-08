@@ -1,5 +1,56 @@
 {% extends "core/layout.html" %}
+{% load static %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static '/core/profile.css' %}">
+{% endblock %}
 
 {% block body %}
-Welcome {{ request.user.username }}
+<div class="profile-page">
+    <div class="profile-box">
+        <div class="panel-header">{{ request.user.username }}&#39;s Profile</div>
+
+        {% if message %}
+            <div class="message">
+                {{ message }}
+            </div>
+        {% endif %}
+
+        <form class="profile-form" action="{% url 'profile' %}" method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="name-field">Username</label>
+                <input class="form-control" id="name-field" type="text"
+                       name="username" placeholder="e.g. CPax" value="{{ request.user.username }}"
+                       readonly>
+            </div>
+
+            <div class="form-group d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <label for="password-field">Password</label>
+                    <input class="form-control" id="password-field" type="password"
+                           name="password" placeholder="e.g. 12345 (jk)" value="********"
+                           readonly>
+                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm ml-2 edit-button">
+                    Edit
+                </button>
+            </div>
+
+            <div class="form-group d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <label for="num-field">Phone Number</label>
+                    <input class="form-control" id="num-field" type="tel"
+                           name="phone_number" value="{{ request.user.profile.phone_number }}"
+                           readonly>
+                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm ml-2 edit-button">
+                    Edit
+                </button>
+            </div>
+            <!-- missing submit button---logic wired later -->
+        </form>
+    </div>
+</div>
 {% endblock %}
