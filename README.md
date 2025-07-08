@@ -52,7 +52,8 @@ things i dont want to forget about when im polishing
 -my number got labeled scam likely... might have to purchase another from twilio and/or get whitelisted by carrier
 -if this app scales to many more users, i should switch to something like telnyx that charges per-second. rn per-minute costs
     are making this expensive.
--security stuff, including sha 384 hash
+-security stuff, including sha 384 
+-make tos actually work
 
 IMPORTANT README TO-INCLUDE INFO:
 "Want to extend my app? Don't forget to create a .env file and define your own values for..."
