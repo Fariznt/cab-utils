@@ -1,11 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+@import url("/static/core/variables.css");
 
 
 .navbar {
   position: fixed;
   width: 100%;
-  background-color: #000000be; 
+  background-color: var(--translucent-black); 
   color: white;
   display: flex;
   align-items: center;
@@ -49,10 +50,10 @@
   text-decoration: none;
   font-weight: 500;
   padding: 10px;
-  background-color: #7b0014a9;
+  background-color: var(--translucent-red);
 }
 
 .navbar-apps a:hover, .navbar-users a:hover {
-  background-color: #7b0015;
+  background-color: var(--translucent-red-hover);
 }
 

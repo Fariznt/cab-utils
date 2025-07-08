@@ -1,12 +1,10 @@
-
-
 .hero-header {
   /* fill the viewport */
   height: 100vh;
   width: 100%;
 
   /* background image settings */
-  background-image: url("https://cdn.discordapp.com/attachments/388721642722820096/1391657633655685120/ChatGPT_Image_Jul_7_2025_01_50_29_AM.png?ex=686cb1ab&is=686b602b&hm=739d11d6cc101c2d687da5fec1f9a43e53a38192a76955d37d4012eb4be6a392&");
+  background-image: url("https://media.discordapp.net/attachments/388721642722820096/1391657633655685120/ChatGPT_Image_Jul_7_2025_01_50_29_AM.png?ex=686e032b&is=686cb1ab&hm=01a9236ec83be1e7cf2eb7a40dc6b0a38000b38383a586ae2ef706c21186d4c9&=&format=webp&quality=lossless&width=2114&height=1410");
   background-size: cover;
   background-position: center;
 

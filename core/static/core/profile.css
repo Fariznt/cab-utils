@@ -1,13 +1,3 @@
-/* Theme */
-:root {
-    --brand-maroon: #ac0d28;
-    --bg-panel:     #eeece7;
-    --border-panel: #dddddd;
-    --border-input: #dadada;
-    --placeholder:  #8a8a8a;
-    --text-main:    #333333;
-}
-
 /* Base Layout*/
 body {
     display: flex;
@@ -85,6 +75,7 @@ body {
     color: var(--placeholder);
     opacity: 0.5;
 }
+
 .form-control:focus::placeholder { color: transparent; }
 
 .form-control:focus {
@@ -118,7 +109,7 @@ body {
 
 .btn-primary:hover,
 .btn-primary:focus {
-    background: #600010;
+    background: var(--brand-maroon-hover);
 }
 
 .edit-button {
@@ -128,8 +119,8 @@ body {
 }
 
 .edit-button:hover {
-    background-color: #ac0d28;
-    border:#600010
+    background-color: var(--brand-maroon);
+    border: var(--brand-maroon);
 }
 
 /* ---------- Checkbox ---------- */

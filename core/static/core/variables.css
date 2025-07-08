@@ -1,0 +1,12 @@
+/* Color Theme */
+:root {
+    --brand-maroon: #ac0d28;
+    --brand-maroon-hover: #600010;
+    --bg-panel:     #eeece7;
+    --border-input: #dadada;
+    --placeholder:  #8a8a8a;
+    --text-main:    #333333;
+    --translucent-black: #000000be;
+    --translucent-red: #7b0014a9;
+    --translucent-red-hover: #7b0015;
+}

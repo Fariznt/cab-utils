@@ -1,0 +1,65 @@
+
+/* Page Background */
+.signal-page {
+    /* Background image */
+    width: 100vw;
+    height: 100vh;
+    background: url("https://cdn.discordapp.com/attachments/388721642722820096/1392217305953341520/aad01b3d-4e96-4e73-992c-424ca014eaa2.png?ex=686ebae7&is=686d6967&hm=22dc72326491fca24a7f74a3ee39466f40a73ac6067a630b9d118ab9deb5b36e&")
+                center/cover no-repeat;
+
+    /* Wrapping of SeatSignal instance elements */
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    align-content: center;
+    padding: 10rem 5rem 0rem 5rem
+
+}
+
+@media (max-aspect-ratio: 10/16) {
+    .signal-page {
+        flex-direction: column;
+        justify-content: center;
+        align-content: center;
+    }
+    .add-button {
+        width: 70%;
+        color: red; /* test */
+    }
+}
+
+.add-button {
+    /* square */
+    width: 300px;
+    height: 300px;
+    background: var(--translucent-black);
+    margin: 50px;
+    cursor: pointer;
+
+    /* center the plus */
+    display: flex;
+    justify-content: center;
+    font-style: sans-serif;
+    align-items: center;
+
+    /* plus sign look */
+    font-size: 200px;
+    font-weight: bold;
+    color: rgba(128,128,128,0.6);
+}
+
+/* centering the plus */
+.add-button span {
+    padding-bottom: 35px;
+    user-select: none;
+}
+
+.add-button:hover {
+    background-color: rgba(42, 42, 42, 0.808);
+}
+
+.signal-element {
+    font-size: xx-large;
+}

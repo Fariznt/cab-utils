@@ -1,13 +1,28 @@
 {% extends "core/layout.html" %}
+{% load static %}
+
+{% block head %}
+        <link rel="stylesheet" href="{% static 'seat-signal/seat_signal.css' %}">
+        <script src="{% static 'seat-signal/seat_signal.js' %}" defer></script>
+{% endblock %}
 
 {% block body %}
-    <strong>seat_signal!!!</strong> <br>
+<div class="signal-page">
+    <!-- <strong>seat_signal!!!</strong> <br>
     Form to test inputs to watch_course: <br>
     <form action="{% url 'watch_course' %}" method="POST">
         {% csrf_token %}
         <input type="text" name="crn" placeholder="crn">
         <input type="text" name="contact_method" placeholder="contact_method (call, text, or both?)">
         <input type="submit" value="Test">
-    </form>
+    </form> -->
+    <div class="signal-elements">
+
+    </div>
+    <div class="add-button"><span>+</span></div>
+
+        
+
+</div>
 {% endblock %}
 
