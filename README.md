@@ -18,19 +18,6 @@ things i dont want to forget about when im polishing
 -definitely want to do a tiny bit of unit testing at least on the API. MAYBE cb later for selenium if its particularly valuable
 -validate phone numbers server+client side, probably with preexisting packages
 -encrypt passwords
--login ui format could mimic an older project
--could probably put login/register under the same html file, use js and render context
-<!-- Later, let users edit password and phone number in the same format as registration. fix username tho
-    <form action="{% url 'update_user' %}" method="POST">
-        {% csrf_token %}
-        Username:
-        <input type="text" name="username" placeholder="e.g. CPax">
-        Password:
-        <input type="password" name="password" placeholder="e.g. 12345 (jk)">
-        Phone number:
-        <input type="tel" name="phone-number">
-        <input type="submit" value="Login">
-    </form> -->
 -let people restart it by text upon failure
 -especially for api users, need the service to be cancellable by text. smth like (gpt example):
     def stop_my_task(request):
@@ -54,6 +41,7 @@ things i dont want to forget about when im polishing
     are making this expensive.
 -security stuff, including sha 384 
 -make tos actually work
+-profile elements need renaming in templates
 
 IMPORTANT README TO-INCLUDE INFO:
 "Want to extend my app? Don't forget to create a .env file and define your own values for..."

@@ -3,6 +3,7 @@
 
 {% block head %}
         <link rel="stylesheet" href="{% static 'seat-signal/seat_signal.css' %}">
+        <link rel="stylesheet" href="{% static 'core/forms.css' %}">
         <script src="{% static 'seat-signal/seat_signal.js' %}" defer></script>
 {% endblock %}
 
@@ -16,9 +17,17 @@
         <input type="text" name="contact_method" placeholder="contact_method (call, text, or both?)">
         <input type="submit" value="Test">
     </form> -->
-    <div class="signal-elements">
+    <template id="signal-form-tpl">
+        <div class="signal-element profile-box">
+            <!-- real form fields go here -->
+            <input type="text" name="crn" placeholder="crn">
+            <input type="text" name="contact_method" placeholder="contact_method (call, text, or both?)">
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Start Watching Seats</button>
+            </div>
+        </div>
+    </template>
 
-    </div>
     <div class="add-button"><span>+</span></div>
 
         
