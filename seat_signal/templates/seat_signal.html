@@ -17,18 +17,47 @@
         <input type="submit" value="Test">
     </form> -->
 
-    <div class="profile-box d-none" id="signal-form">
+    <!-- <div class="profile-box d-none" id="signal-form">
         <input type="text" name="crn" placeholder="crn">
         <input type="text" name="contact_method" placeholder="contact_method (call, text, or both?)">
         <div class="form-group">
             <button type="submit" class="btn btn-primary start">Start Watching</button>
         </div>
+    </div> -->
+
+    <div class="profile-box d-none" id="signal-form">
+        <select name="code-selection">
+            <option value="">Course Code</option>
+            {% for code in codes %}
+                <option value="{{ code }}">{{ code }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="section-selection">
+            <option value="">Section #</option>
+            {% for section in sections %}
+                <option value="{{ section }}">{{ section }}</option>
+            {% endfor %}
+        </select>
+
+
+        <div class="selection-control">
+            <label for="call-check">
+                <input type="checkbox" name="call-check" value="true">
+                Call me
+            </label>
+            <label for="text-check">
+                <input type="checkbox" name="text-check" value="true">
+                Text me
+            </label>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary start">Watch Course</button>
+        </div>
     </div>
 
-
-    <div class="add-button"><span>+</span></div>
-
-        
+    <div class="add-button"><span>+</span></div>    
 
 </div>
 {% endblock %}

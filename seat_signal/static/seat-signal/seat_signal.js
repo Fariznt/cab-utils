@@ -28,7 +28,14 @@ function add_signal_form() {
 
 function submit_signal_form() {
     if (validate_input()) {
-        // post new seat signal
+        // post new seat signal (use watch_course)
+        fetch('api/watch_course', {
+            method: 'POST',
+            body: JSON.stringify({
+                
+            })
+            // .. CONT HERE
+        })
 
         // remove form used to add signal
         form.classList.add('d-none');
