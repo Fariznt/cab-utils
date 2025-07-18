@@ -15,6 +15,8 @@ for now, im deferring texting functionality (Due to cost on twilio), but want to
     if i add texting, i should probably use voips for lower cost.
 
 things i dont want to forget about when im polishing
+-exception handling in watch_tasks
+-enforce that there are no duplicate tasks at multiple levels
 -definitely want to do a tiny bit of unit testing at least on the API. MAYBE cb later for selenium if its particularly valuable
 -validate phone numbers server+client side, probably with preexisting packages
 -encrypt passwords

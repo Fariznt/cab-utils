@@ -3,7 +3,11 @@
 
 {% block head %}
         <link rel="stylesheet" href="{% static 'seat-signal/seat_signal.css' %}">
-        <script src="{% static 'seat-signal/seat_signal.js' %}" defer></script>
+        <script>
+            window.watchCourseUrl = "{% url 'watch_course' %}";
+            window.csrftoken = "{{ csrf_token }}";
+        </script>
+        <script defer src="{% static 'seat-signal/seat_signal.js' %}" defer></script>
 {% endblock %}
 
 {% block body %}
@@ -17,31 +21,32 @@
         <input type="submit" value="Test">
     </form> -->
 
-    <!-- <div class="profile-box d-none" id="signal-form">
-        <input type="text" name="crn" placeholder="crn">
-        <input type="text" name="contact_method" placeholder="contact_method (call, text, or both?)">
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary start">Start Watching</button>
-        </div>
-    </div> -->
-
     <div class="profile-box d-none" id="signal-form">
-        <select name="code-selection">
-            <option value="">Course Code</option>
+        <div id="message"></div>
+
+        <select id="sem-selection">
+            <option value="">-- Semester --</option>
+            {% for sem_id, sem_label in recent_sems %}
+                <option value="{{ sem_id }}">{{ sem_label }}</option>
+            {% endfor %}
+        </select>
+
+        <select id="code-selection">
+            <option value="">-- Course Code --</option>
             {% for code in codes %}
                 <option value="{{ code }}">{{ code }}</option>
             {% endfor %}
         </select>
 
-        <select name="section-selection">
-            <option value="">Section #</option>
+        <select id="section-selection">
+            <option value="">-- Section # --</option>
             {% for section in sections %}
                 <option value="{{ section }}">{{ section }}</option>
             {% endfor %}
         </select>
 
-
-        <div class="selection-control">
+        <!-- Currently no backend for texting; calling is the only option for now-->
+        <!-- <div class="selection-control" id="contact-method-selection">
             <label for="call-check">
                 <input type="checkbox" name="call-check" value="true">
                 Call me
@@ -50,7 +55,7 @@
                 <input type="checkbox" name="text-check" value="true">
                 Text me
             </label>
-        </div>
+        </div> -->
 
         <div class="form-group">
             <button type="submit" class="btn btn-primary start">Watch Course</button>

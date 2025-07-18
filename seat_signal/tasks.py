@@ -13,7 +13,7 @@ import os
 @background(schedule=0) # begin immediately, repeat every 30 seconds
 def watch_task(crn, number, contact_method, repeat=10, repeat_until=None):
     """Polls the C@B API to check for seat availability. If there's a seat, contacts the user."""
-    print("watch_Task reached for real for real")
+    print(f'number:{number}')
 
     # Get course session details from C@B's API
     payload = {
@@ -68,7 +68,7 @@ def send_signal(crn, to_number, contact_method) -> None:
             twiml = voice_resp.to_xml()
         )
     elif contact_method == 'text':
-        pass #TODO
+        pass #Not currently supported. If statement exists only to provide infrastructure for later addition
     
 def get_twilio_credentials():
     """Retrieves Twilio account sid, auth token, and the number to call with from .env file in project root."""
