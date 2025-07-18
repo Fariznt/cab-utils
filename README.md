@@ -10,11 +10,12 @@ unspecified time in future:
 -unit testing
 
 
-for now, im deferring exposing a seat_signal API. it probably wont get used at least for a while, and its complicating my prototyping
 for now, im deferring texting functionality (Due to cost on twilio), but want to keep the app extensible for texting as a signal method.
     if i add texting, i should probably use voips for lower cost.
 
 things i dont want to forget about when im polishing
+-refactor tasks.py for scale: have only one running regardless of seat signals, and let it check all people's signals through ONE api call to C@B instead of linearly scaling with signals
+    also make the single task a heartbeat task asw---have it cache the timezone.now() so i can check in django code to see if its running (allowing error handling)
 -exception handling in watch_tasks
 -enforce that there are no duplicate tasks at multiple levels
 -definitely want to do a tiny bit of unit testing at least on the API. MAYBE cb later for selenium if its particularly valuable

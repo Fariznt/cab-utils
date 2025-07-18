@@ -81,6 +81,10 @@
     display: inline-block;
 }
 
+#message {
+    color: red
+}
+
 /* Card Header */
 .panel-header {
     background: var(--brand-maroon);

@@ -5,7 +5,7 @@ const addBtn = container.querySelector('.add-button');
 const form = document.getElementById('signal-form');
 
 document.addEventListener('DOMContentLoaded', () => { // TODO rmeove probably dont need it with defer
-    console.log("logging")
+    console.log("logging") //TODO REMOVE
     load_current()
     // add form
     addBtn.addEventListener('click', () => add_signal_form());
@@ -36,11 +36,11 @@ function submit_signal_form() {
 
     if (validate_input(sem_id, code, section)) {
         // create form using what the user selected
-        const form = new FormData();
-        form.append('sem_id', sem_id);
-        form.append('code', code);
-        form.append('section', section);
-        form.append('contact_method', 'call'); // hardcoded for now as there is no backend for texting
+        const formData = new FormData();
+        formData.append('sem_id', sem_id);
+        formData.append('code', code);
+        formData.append('section', section);
+        formData.append('contact_method', 'call'); // hardcoded for now as there is no backend for texting
 
         // post new seat signal (use watch_course)
         fetch(watchCourseUrl, {
@@ -49,16 +49,12 @@ function submit_signal_form() {
             headers: {
                 'X-CSRFToken': csrftoken
             },
-            body: form
+            body: formData
         })
-        .then(response => {
-            console.log(response)
-            console.log(response.json())
-            response.json();
-        })
+        .then(response => response.json())
         .then(result => {
             if (result.status == 'failure') {
-                document.querySelector('message').innerHTML = result.message
+                document.querySelector('#message').innerHTML = result.message
             } else if (result.status == 'success') {
                 // remove form used to add signal
                 form.classList.add('d-none');

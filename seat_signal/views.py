@@ -60,6 +60,7 @@ def watch_course(request):
     # Get session
     try:
         session = CourseSession.objects.get(code=code, section=section, sem_id=sem_id)
+        print(session.section)
     except CourseSession.DoesNotExist:
         return JsonResponse({'status': 'failure', 'message': 'Session does not exist!'})
     except MultipleObjectsReturned:
@@ -73,7 +74,7 @@ def watch_course(request):
 
         number = request.user.phone_num
 
-        watch_task(session.crn, number, contact_method)
+        #watch_task(session.crn, number, contact_method)
         return JsonResponse({'status': 'success', 'message': 'Watching course, crn:' + session.crn})
     except Exception as e:
         return JsonResponse({'status': 'failure', 'message': f'Error: {e}'})
