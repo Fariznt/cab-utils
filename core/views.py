@@ -62,4 +62,4 @@ def profile_view(request):
 
 def logout_view(request):
     logout(request)
-    return render(request, "core/index.html")
+    return HttpResponseRedirect(reverse("index"))

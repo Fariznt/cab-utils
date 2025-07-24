@@ -16,7 +16,9 @@ for now, im deferring texting functionality (Due to cost on twilio), but want to
 things i dont want to forget about when im polishing
 -refactor tasks.py for scale: have only one running regardless of seat signals, and let it check all people's signals through ONE api call to C@B instead of linearly scaling with signals
     also make the single task a heartbeat task asw---have it cache the timezone.now() so i can check in django code to see if its running (allowing error handling)
--exception handling in watch_tasks
+    also at the same time add buffer to calls arent spammed and i dont end up on a scam likely list
+    exception handling in watch_tasks
+    
 -enforce that there are no duplicate tasks at multiple levels
 -definitely want to do a tiny bit of unit testing at least on the API. MAYBE cb later for selenium if its particularly valuable
 -validate phone numbers server+client side, probably with preexisting packages

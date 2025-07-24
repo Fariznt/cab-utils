@@ -10,10 +10,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
-@background(schedule=0) # begin immediately, repeat every 30 seconds
+@background(schedule=0) # begin immediately, repeat every 10 seconds
 def watch_task(crn, number, contact_method, repeat=10, repeat_until=None):
     """Polls the C@B API to check for seat availability. If there's a seat, contacts the user."""
-    print(f'number:{number}')
 
     # Get course session details from C@B's API
     payload = {

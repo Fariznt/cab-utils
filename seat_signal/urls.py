@@ -5,5 +5,6 @@ urlpatterns = [
     path('', views.ss_view, name='seat_signal'),
 
     # API Routes
-    path('api/watch_course', views.watch_course, name='watch_course') 
+    path('api/watch_course', views.watch_course, name='watch_course'),
+    path('api/get_auth', views.get_auth, name='get_auth')
 ]

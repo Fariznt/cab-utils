@@ -6,9 +6,7 @@ from seat_signal.models import SeatSignal
 from django.db.models.functions import Substr
 from django.db.models import Q
 from django.core.exceptions import MultipleObjectsReturned
-
-
-
+from django.core import serializers
 
 def ss_view(request):
     """
@@ -41,6 +39,10 @@ def ss_view(request):
     })
 
 def watch_course(request):
+    """
+    API endpoint that to POST a new course session-watching 'Seat Signal'.
+    """
+
     if not request.user.is_authenticated:
         return JsonResponse({'status': 'failure', 'message': 'User not authenticated'})
     
@@ -60,7 +62,6 @@ def watch_course(request):
     # Get session
     try:
         session = CourseSession.objects.get(code=code, section=section, sem_id=sem_id)
-        print(session.section)
     except CourseSession.DoesNotExist:
         return JsonResponse({'status': 'failure', 'message': 'Session does not exist!'})
     except MultipleObjectsReturned:
@@ -79,6 +80,23 @@ def watch_course(request):
     except Exception as e:
         return JsonResponse({'status': 'failure', 'message': f'Error: {e}'})
 
+def get_signals(request):
+    """
+    API endpoint to GET all active signals for active user.
+    """
+    signals = SeatSignal.objects.get(user=request.user)
+    json_str = serializers.serialize('json', [signals])
+    return HttpResponse(json_str)
+
+def get_auth(request):
+    """
+    API endpoint to GET authentication information.
+    """
+    is_auth = request.user.is_authenticated
+    return JsonResponse({
+        "is_authenticated": is_auth,
+        "username": request.user.username if is_auth else None,
+    })
     
 def get_recent_sems(sem_ids: list[str], n: int = 2) -> list[str]:
     """
@@ -106,7 +124,7 @@ def get_recent_sems(sem_ids: list[str], n: int = 2) -> list[str]:
 
 def get_sem_str(sem_id: str) -> str:
     """
-    Takes a string semester id and returns a readable representation of the semester (e.g. Fall 2025)
+    Helper that takes a string semester id and returns a readable representation of the semester (e.g. Fall 2025)
     """
     term_names = {
         '15': 'Winter',
@@ -120,7 +138,7 @@ def get_sem_str(sem_id: str) -> str:
 
 def get_sem_id(sem_str: str) -> str:
     """
-    Takes a readable representation of the semester in '<Term> <Year>' format and converts to semester id
+    Helper that takes a readable representation of the semester in '<Term> <Year>' format and converts to semester id
     """
     term_names = {
         'Winter': '15',
