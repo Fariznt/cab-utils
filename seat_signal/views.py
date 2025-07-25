@@ -6,7 +6,7 @@ from seat_signal.models import SeatSignal
 from django.db.models.functions import Substr
 from django.db.models import Q
 from django.core.exceptions import MultipleObjectsReturned
-from django.core import serializers
+import json
 
 def ss_view(request):
     """
@@ -80,13 +80,26 @@ def watch_course(request):
     except Exception as e:
         return JsonResponse({'status': 'failure', 'message': f'Error: {e}'})
 
-def get_signals(request):
+def get_signal_sessions(request):
     """
-    API endpoint to GET all active signals for active user.
+    API endpoint to GET session info for all active signals for active user in JSON.
     """
-    signals = SeatSignal.objects.get(user=request.user)
-    json_str = serializers.serialize('json', [signals])
-    return HttpResponse(json_str)
+    sessions = CourseSession.objects.filter(session_signals__user=request.user)
+    sessions_attr_list = []
+    for session in sessions:
+        session_elt = {
+            'semester': get_sem_str(session.sem_id),
+            'code': session.code,
+            'section': session.section
+        }
+        sessions_attr_list += [session_elt]
+
+    payload = {
+        'attribute_list': sessions_attr_list,
+        'count': len(sessions_attr_list)
+        }
+
+    return JsonResponse(payload)
 
 def get_auth(request):
     """

@@ -6,6 +6,7 @@
         <script>
             window.watchCourseUrl = "{% url 'watch_course' %}";
             window.getAuthUrl = "{% url 'get_auth' %}"
+            window.getSessionsUrl = "{% url 'get_signal_sessions' %}"
             window.csrftoken = "{{ csrf_token }}";
         </script>
         <script defer src="{% static 'seat-signal/seat_signal.js' %}" defer></script>
@@ -13,14 +14,13 @@
 
 {% block body %}
 <div class="signal-page">
-    <!-- <strong>seat_signal!!!</strong> <br>
-    Form to test inputs to watch_course: <br>
-    <form action="{% url 'watch_course' %}" method="POST">
-        {% csrf_token %}
-        <input type="text" name="crn" placeholder="crn">
-        <input type="text" name="contact_method" placeholder="contact_method (call, text, or both?)">
-        <input type="submit" value="Test">
-    </form> -->
+    <template id="filled-form">
+        <div class="profile-box">
+            <select disabled><option class="signal-sem-val"></option></select>
+            <select disabled><option class="signal-code-val"></option></select>
+            <select disabled><option class="signal-section-val"></option></select>
+        </div>
+    </template>
 
     <div class="profile-box d-none" id="signal-form">
         <div id="message"></div>
@@ -63,7 +63,7 @@
         </div>
     </div>
 
-    <div class="add-button"><span>+</span></div>    
+    <div id="add-button"><span>+</span></div>    
 
 </div>
 {% endblock %}

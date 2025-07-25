@@ -1,15 +1,16 @@
 const csrftoken = window.csrftoken;
 const watchCourseUrl = window.watchCourseUrl;
-const user = window.currentUsername;
 const getAuthUrl = window.getAuthUrl;
+const getSessionsUrl = window.getSessionsUrl;
 
 const container = document.querySelector('.signal-page');
-const addBtn = container.querySelector('.add-button');
-const form = document.getElementById('signal-form');
+const addBtn = container.querySelector('#add-button');
+const form = container.querySelector('#signal-form');
+const filledFormTpl = document.querySelector('#filled-form');
 
 
 // Load in user info
-let logged_in = false
+let loggedIn = false
 fetch(getAuthUrl, {
     method: 'GET',
     credentials: 'same-origin',
@@ -26,7 +27,6 @@ fetch(getAuthUrl, {
     }
 })
 
-
 document.addEventListener('DOMContentLoaded', () => { 
     // Load form to create new signal when user clicks add button
     addBtn.addEventListener('click', () => {
@@ -35,19 +35,37 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             alert("You cannot use SeatSignal without being logged in! A phone number is needed to send alerts.")
         }
-
     });
 });
 
-
 function loadCurrentSignals() {
     // use API to get existing signals and load them into the page
-    console.log("load called")
-    // 1. use get_signals and log it so ik what im even getting. decide on it or smth else b4 moving on
-    // 2. make nay needed changes to the view function
-    // 3. make the actual loadCurrentsignals function
+
+    fetch(getSessionsUrl, {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+            'X-CSRFToken': csrftoken
+        }
+    })
+    .then(response => response.json())
+    .then(signals => {
+        for (let i = 0; i < signals.count; i++) {
+            sem = signals.attribute_list[i].semester
+            code = signals.attribute_list[i].code
+            sec = signals.attribute_list[i].section
+            loadFilledForm(sem, code, sec)
+        }
+    })
 }
 
+function loadFilledForm(semester, code, section) {
+    let filledForm = filledFormTpl.content.cloneNode(true)
+    filledForm.querySelector('.signal-sem-val').innerHTML = semester
+    filledForm.querySelector('.signal-code-val').innerHTML = code
+    filledForm.querySelector('.signal-section-val').innerHTML = section
+    container.insertBefore(filledForm, form)
+}
 
 function addSignalForm() {
     // remove add button (until submission)
@@ -62,8 +80,9 @@ function addSignalForm() {
 }
 
 function submitSignalForm() {
-    sem_id = document.querySelector('#sem-selection').value,
-    code = document.querySelector('#code-selection').value,
+    sem_id = document.querySelector('#sem-selection').value
+    sem_label = document.querySelector('#sem-selection').innerHTML
+    code = document.querySelector('#code-selection').value
     section = document.querySelector('#section-selection').value
     // contactMethod = ... currently not implemented
 
@@ -92,10 +111,11 @@ function submitSignalForm() {
                 // remove form used to add signal
                 form.classList.add('d-none');
 
-                // append the completed form
+                // add the completed form to loaded forms
                 temp = document.createElement("span"); // TEMPORARY ELEMENT, WILL BE REPLACED WITH FULL ACTUAL FORM. implementation will be shared with initial completed form loading
                 temp.textContent = 'temp';
                 container.insertBefore(temp, form);
+                loadFilledForm(sem_label, code, section)
 
                 // bring back add button
                 if (!reachedSignalCap()) {

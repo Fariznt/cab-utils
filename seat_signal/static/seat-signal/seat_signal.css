@@ -24,13 +24,13 @@
         justify-content: center;
         align-content: center;
     }
-    .add-button {
+    #add-button {
         width: 70%;
         color: red; /* test */
     }
 }
 
-.add-button {
+#add-button {
     /* square */
     width: 200px;
     height: 200px;
@@ -51,18 +51,18 @@
 }
 
 /* centering the plus */
-.add-button span {
+#add-button span {
     padding-bottom: 35px;
     user-select: none;
 }
 
-.add-button:hover {
+#add-button:hover {
     background-color: rgba(42, 42, 42, 0.808);
 }
 
-
+/* TODO: make this insntead inherit from forms.css*/
 /* Card */
-#signal-form {
+.profile-box {
     max-width: 200px;
     max-height: 100vh;
     width: 100%;
