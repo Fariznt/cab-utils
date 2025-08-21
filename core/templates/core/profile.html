@@ -35,21 +35,21 @@
                            name="password" placeholder="e.g. 12345 (jk)" value="********"
                            readonly>
                 </div>
-                <button type="button" class="btn btn-outline-primary btn-sm ml-2 edit-button">
+                <!-- <button type="button" class="btn btn-sm ml-2 edit-button">
                     Edit
-                </button>
+                </button> -->
             </div>
 
             <div class="form-group d-flex align-items-center">
                 <div class="flex-grow-1">
                     <label for="num-field">Phone Number</label>
                     <input class="form-control" id="num-field" type="tel"
-                           name="phone_number" value="{{ request.user.profile.phone_number }}"
+                           name="phone_number" value="{{ request.user.phone_num }}"
                            readonly>
                 </div>
-                <button type="button" class="btn btn-outline-primary btn-sm ml-2 edit-button">
+                <!-- <button type="button" class="btn btn-sm ml-2 edit-button">
                     Edit
-                </button>
+                </button> -->
             </div>
             <!-- missing submit button---logic wired later -->
         </form>

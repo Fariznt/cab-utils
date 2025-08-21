@@ -1,3 +1,5 @@
+@import url("/static/core/variables.css");
+
 /* Base Layout*/
 body {
     display: flex;
@@ -16,4 +18,12 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+
+.btn:focus,
+.btn:active,
+.btn.active {
+    box-shadow: var(--brand-maroon) !important;
+    outline: none !important;
 }

@@ -8,7 +8,6 @@ const addBtn = container.querySelector('#add-button');
 const form = container.querySelector('#signal-form');
 const filledFormTpl = document.querySelector('#filled-form');
 
-
 // Load in user info
 let loggedIn = false
 fetch(getAuthUrl, {
@@ -112,9 +111,6 @@ function submitSignalForm() {
                 form.classList.add('d-none');
 
                 // add the completed form to loaded forms
-                temp = document.createElement("span"); // TEMPORARY ELEMENT, WILL BE REPLACED WITH FULL ACTUAL FORM. implementation will be shared with initial completed form loading
-                temp.textContent = 'temp';
-                container.insertBefore(temp, form);
                 loadFilledForm(sem_label, code, section)
 
                 // bring back add button

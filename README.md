@@ -47,6 +47,8 @@ things i dont want to forget about when im polishing
 -security stuff, including sha 384 
 -make tos actually work
 -profile elements need renaming in templates
+    clean up css overall. make filled form and regular form class, and then share them w/ seat signal
+
 
 IMPORTANT README TO-INCLUDE INFO:
 "Want to extend my app? Don't forget to create a .env file and define your own values for..."
