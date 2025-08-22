@@ -15,14 +15,18 @@
 {% block body %}
 <div class="signal-page">
     <template id="filled-form">
-        <div class="profile-box">
+        <div class="profile-box signal-form">
             <select disabled><option class="signal-sem-val"></option></select>
             <select disabled><option class="signal-code-val"></option></select>
             <select disabled><option class="signal-section-val"></option></select>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary delete">Delete</button>
+            </div>
         </div>
     </template>
 
-    <div class="profile-box d-none" id="signal-form">
+    <div class="profile-box signal-form d-none" id="signal-form">
         <div id="message"></div>
 
         <select id="sem-selection">

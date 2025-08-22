@@ -48,6 +48,10 @@ things i dont want to forget about when im polishing
 -make tos actually work
 -profile elements need renaming in templates
     clean up css overall. make filled form and regular form class, and then share them w/ seat signal
+-dont let register before checking box
+-edit button for profiel, deleting profile
+-do some editing for background image
+-Make seat_signal.css inherit from profile and also fix the blue buttons together
 
 
 IMPORTANT README TO-INCLUDE INFO:

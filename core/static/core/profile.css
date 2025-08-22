@@ -12,8 +12,11 @@ body {
 .profile-page {
     width: 100vw;
     height: 100vh;
-    background: url("https://media.discordapp.net/attachments/388721642722820096/1392020026948845649/ChatGPT_Image_Jul_8_2025_01_50_31_AM.png?ex=686e032c&is=686cb1ac&hm=7e48820b60b5a7ca64adef000a2a7aab7515d131c7aeaf5f5531ab8f4b115852&=&format=webp&quality=lossless&width=1577&height=1052")
-                center/cover no-repeat;
+
+    background-color: var(--placeholder);
+    background-image: url("https://i.imgur.com/zAjaPB2.png");
+    background-size: cover;
+    background-position: center;
 
     display: flex;
     align-items: center;

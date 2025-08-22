@@ -4,7 +4,7 @@
     /* Background image */
     width: 100vw;
     height: 100vh;
-    background: url("https://cdn.discordapp.com/attachments/388721642722820096/1392217305953341520/aad01b3d-4e96-4e73-992c-424ca014eaa2.png?ex=686ebae7&is=686d6967&hm=22dc72326491fca24a7f74a3ee39466f40a73ac6067a630b9d118ab9deb5b36e&")
+    background: url("https://i.imgur.com/BhybeOa.png")
                 center/cover no-repeat;
 
     /* Wrapping of SeatSignal instance elements */
@@ -35,7 +35,7 @@
     width: 200px;
     height: 200px;
     background: var(--translucent-black);
-    margin: 20px;
+    margin: 3rem;
     cursor: pointer;
 
     /* center the plus */
@@ -60,7 +60,6 @@
     background-color: rgba(42, 42, 42, 0.808);
 }
 
-/* TODO: make this insntead inherit from forms.css*/
 /* Card */
 .profile-box {
     max-width: 200px;
@@ -109,6 +108,14 @@
 
 .form-check {
     margin: -0.4rem 0;
+}
+
+.signal-form select {
+    margin: 0.5rem;
+}
+
+.signal-form {
+    margin: 2rem
 }
 
 /* Inputs */

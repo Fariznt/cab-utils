@@ -64,6 +64,8 @@ function loadFilledForm(semester, code, section) {
     filledForm.querySelector('.signal-code-val').innerHTML = code
     filledForm.querySelector('.signal-section-val').innerHTML = section
     container.insertBefore(filledForm, form)
+
+    // ADD DELETE FUNCTIONALITY HERE
 }
 
 function addSignalForm() {
