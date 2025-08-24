@@ -5,8 +5,8 @@
         <link rel="stylesheet" href="{% static 'seat-signal/seat_signal.css' %}">
         <script>
             window.watchCourseUrl = "{% url 'watch_course' %}";
-            window.getAuthUrl = "{% url 'get_auth' %}"
-            window.getSessionsUrl = "{% url 'get_signal_sessions' %}"
+            window.getAuthUrl = "{% url 'get_auth' %}";
+            window.getSessionsUrl = "{% url 'get_signal_sessions' %}";
             window.csrftoken = "{{ csrf_token }}";
         </script>
         <script defer src="{% static 'seat-signal/seat_signal.js' %}" defer></script>

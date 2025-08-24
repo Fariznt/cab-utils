@@ -79,6 +79,22 @@ def watch_course(request):
         return JsonResponse({'status': 'success', 'message': 'Watching course, crn:' + session.crn})
     except Exception as e:
         return JsonResponse({'status': 'failure', 'message': f'Error: {e}'})
+    
+def stop_watching_course(request, semester, code, section):
+    """
+    API endpoint to DELETE an instance of seat signal with a given semester, course code, and section.
+    """
+    if request.method != 'DELETE':
+        return HttpResponse(status=405)  # Method not allowed
+    try:
+        # pull expected parameters
+        sem_id = get_sem_id(semester)
+        session_to_delete = CourseSession.objects.get(code = code, section = section, sem_id = sem_id)
+        signal_to_delete = SeatSignal.objects.get(user = request.user, session = session_to_delete)
+        signal_to_delete.delete()
+        return HttpResponse(status=204)  # No content
+    except (CourseSession.DoesNotExist, SeatSignal.DoesNotExist):
+        return HttpResponse(status=404)
 
 def get_signal_sessions(request):
     """
@@ -113,7 +129,7 @@ def get_auth(request):
     
 def get_recent_sems(sem_ids: list[str], n: int = 2) -> list[str]:
     """
-    Takes a list of semester ids (e.g. 202510) and returns a list of the n most recent semesters as a tuple including 
+    Helper that takes a list of semester ids (e.g. 202510) and returns a list of the n most recent semesters as a tuple including 
     a readable version of the semester representation e.g. (202510, Fall 2025)
     """
     # Define chronological ordering of term-related substring in sem_id 

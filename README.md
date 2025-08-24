@@ -14,25 +14,10 @@ for now, im deferring texting functionality (Due to cost on twilio), but want to
     if i add texting, i should probably use voips for lower cost.
 
 things i dont want to forget about when im polishing
--refactor tasks.py for scale: have only one running regardless of seat signals, and let it check all people's signals through ONE api call to C@B instead of linearly scaling with signals
-    also make the single task a heartbeat task asw---have it cache the timezone.now() so i can check in django code to see if its running (allowing error handling)
-    also at the same time add buffer to calls arent spammed and i dont end up on a scam likely list
-    exception handling in watch_tasks
-    
--enforce that there are no duplicate tasks at multiple levels
 -definitely want to do a tiny bit of unit testing at least on the API. MAYBE cb later for selenium if its particularly valuable
 -validate phone numbers server+client side, probably with preexisting packages
 -encrypt passwords
 -let people restart it by text upon failure
--especially for api users, need the service to be cancellable by text. smth like (gpt example):
-    def stop_my_task(request):
-    # filter by task name and, optionally, by your args
-    Task.objects.filter(
-        task_name='my_looping_task',
-        # Uncomment to match specific args:
-        # task_params__contains='"arg1_value"'
-    ).delete()
-    return HttpResponse("Stopped my_looping_task.")
 -privacy policy regarding phone numbers and passwords (not gauranteeing safety of data but gauranteeing it wont be deliberately sold)
 -prevent duplicate numbers when watching a seat
 -if i ship this fully into production for student use, i need backups for the database, plus figure moving databases in and out without
@@ -45,13 +30,27 @@ things i dont want to forget about when im polishing
 -if this app scales to many more users, i should switch to something like telnyx that charges per-second. rn per-minute costs
     are making this expensive.
 -security stuff, including sha 384 
--make tos actually work
 -profile elements need renaming in templates
     clean up css overall. make filled form and regular form class, and then share them w/ seat signal
 -dont let register before checking box
 -edit button for profiel, deleting profile
 -do some editing for background image
 -Make seat_signal.css inherit from profile and also fix the blue buttons together
+
+-make utils.py for seatsignal app
+-enforce signal cap and duplicates client/frontend (rn, when u add duplicate, it adds n+1 duplicates)
+-fix imgur not working either
+-refactor tasks.py for scale: have only one running regardless of seat signals, and let it check all people's signals through ONE api call to C@B instead of linearly scaling with signals (note that i havent verified that deletion carries over to the background task. in refactor, make sure that signals checked are based on current existent objects for model seatsignal, so that it does)
+    also make the single task a heartbeat task asw---have it cache the timezone.now() so i can check in django code to see if its running (allowing error handling)
+    also at the same time add buffer to calls arent spammed and i dont end up on a scam likely list
+    exception handling in watch_tasks
+-security stuff
+-restfulify and make more secure and consistent my API
+
+-barebones prereq map
+-homepage readme barebones
+-final security polish, and ship
+
 
 
 IMPORTANT README TO-INCLUDE INFO:

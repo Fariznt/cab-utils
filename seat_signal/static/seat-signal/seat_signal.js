@@ -2,6 +2,7 @@ const csrftoken = window.csrftoken;
 const watchCourseUrl = window.watchCourseUrl;
 const getAuthUrl = window.getAuthUrl;
 const getSessionsUrl = window.getSessionsUrl;
+const deleteUrlTpl = 'api/seat-signals/SEM_PLACEHOLDER/CODE_PLACEHOLDER/SEC_PLACEHOLDER/';
 
 const container = document.querySelector('.signal-page');
 const addBtn = container.querySelector('#add-button');
@@ -59,13 +60,44 @@ function loadCurrentSignals() {
 }
 
 function loadFilledForm(semester, code, section) {
+    // Make clone
     let filledForm = filledFormTpl.content.cloneNode(true)
     filledForm.querySelector('.signal-sem-val').innerHTML = semester
     filledForm.querySelector('.signal-code-val').innerHTML = code
     filledForm.querySelector('.signal-section-val').innerHTML = section
-    container.insertBefore(filledForm, form)
 
-    // ADD DELETE FUNCTIONALITY HERE
+    // Attach event listener for deleting
+    let deleteBtn = filledForm.querySelector('.delete');
+    deleteBtn.addEventListener('click', (event) => deleteSignal(semester, code, section, event))
+
+    // Insert
+    container.insertBefore(filledForm, form)
+}
+
+function deleteSignal(semester, code, section, event) {
+    // Remove on frontend
+    const formToDelete = event.target.parentElement.parentElement;
+    formToDelete.remove()
+
+    // Make call to remove on backend
+    console.log(deleteUrlTpl)
+    const deleteUrl = deleteUrlTpl
+    .replace("SEM_PLACEHOLDER", `${semester}`)
+    .replace("CODE_PLACEHOLDER", `${code}`)
+    .replace("SEC_PLACEHOLDER", `${section}`)
+    console.log(deleteUrl)
+
+    fetch(deleteUrl, {
+        method: 'DELETE',
+        credentials: 'same-origin',
+        headers: {
+            'X-CSRFToken': csrftoken
+        }
+    }).then(response => {
+        if (!response.ok) {
+            console.error('Delete failed:', response.status);
+        }
+    });
 }
 
 function addSignalForm() {
