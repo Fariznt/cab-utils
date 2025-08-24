@@ -2,6 +2,7 @@ from background_task import background
 from background_task.models import Task
 import requests
 import json
+from seat_signal import utils
 from twilio.rest import Client
 from twilio.twiml.voice_response import VoiceResponse
 from core.models import CourseSession, User
@@ -59,7 +60,7 @@ def send_signal(crn, to_number, contact_method) -> None:
         voice_resp.pause(length=1.5)
         voice_resp.say(msg, voice="alice")
         # Create client & call
-        ACCOUNT_SID, AUTH_TOKEN, FROM_NUMBER = get_twilio_credentials()
+        ACCOUNT_SID, AUTH_TOKEN, FROM_NUMBER = utils.get_twilio_credentials()
         client = Client(ACCOUNT_SID, AUTH_TOKEN)
         call = client.calls.create(
             to=to_number, 
@@ -68,19 +69,3 @@ def send_signal(crn, to_number, contact_method) -> None:
         )
     elif contact_method == 'text':
         pass #Not currently supported. If statement exists only to provide infrastructure for later addition
-    
-def get_twilio_credentials():
-    """Retrieves Twilio account sid, auth token, and the number to call with from .env file in project root."""
-    PROJECT_DIR = Path(__file__).resolve().parent.parent
-    loaded = load_dotenv(PROJECT_DIR/".env")
-    if not loaded:
-        raise FileNotFoundError(
-            ".env not found in project root. Create a .env file and define " \
-            "ACCOUNT_SID, AUTH_TOKEN, FROM_NUMBER associated with your Twilio account."
-        )
-    
-    ACCOUNT_SID = os.getenv("ACCOUNT_SID")
-    AUTH_TOKEN = os.getenv("AUTH_TOKEN")
-    FROM_NUMBER = os.getenv("FROM_NUMBER")
-
-    return ACCOUNT_SID, AUTH_TOKEN, FROM_NUMBER

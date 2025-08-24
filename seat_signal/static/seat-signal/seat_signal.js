@@ -20,7 +20,6 @@ fetch(getAuthUrl, {
 })
 .then(response => response.json())
 .then(userAuthInfo => {
-    console.log(userAuthInfo)
     if (userAuthInfo.is_authenticated) {
         loadCurrentSignals()
         loggedIn = true
