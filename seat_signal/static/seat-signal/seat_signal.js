@@ -113,7 +113,8 @@ function addSignalForm() {
 
 function submitSignalForm() {
     sem_id = document.querySelector('#sem-selection').value
-    sem_label = document.querySelector('#sem-selection').innerHTML
+    sem_selection =  document.querySelector('#sem-selection')
+    sem_label = sem_selection.options[sem_selection.selectedIndex].dataset.semLabel
     code = document.querySelector('#code-selection').value
     section = document.querySelector('#section-selection').value
     // contactMethod = ... currently not implemented
@@ -138,7 +139,7 @@ function submitSignalForm() {
         .then(response => response.json())
         .then(result => {
             if (result.status == 'failure') {
-                document.querySelector('#message').innerHTML = result.message
+                document.querySelector('.message').innerHTML = result.message
             } else if (result.status == 'success') {
                 // remove form used to add signal
                 form.classList.add('d-none');

@@ -67,7 +67,8 @@
 
 /* Helper Text */
 .message {
-    color: red
+    color: red;
+    text-align: center;
 }
 
 .text-muted {

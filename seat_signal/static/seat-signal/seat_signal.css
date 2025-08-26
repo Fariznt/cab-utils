@@ -1,56 +1,52 @@
-
-/* Page Background */
+/* page layout */
 .signal-page {
-    /* Background image */
     width: 100vw;
     height: 100vh;
-    background: url("https://i.imgur.com/BhybeOa.png")
-                center/cover no-repeat;
-
-    /* Wrapping of SeatSignal instance elements */
+    background: url("https://i.imgur.com/BhybeOa.png") center/cover no-repeat;
+    
+    /* flexbox layout for signal instances */
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
     align-items: flex-start;
     justify-content: center;
     align-content: center;
-    padding: 10rem 5rem 0rem 5rem
-
+    padding: 10rem 5rem 0rem 5rem;
 }
 
+/* mobile responsiveness */
 @media (max-aspect-ratio: 10/16) {
     .signal-page {
         flex-direction: column;
         justify-content: center;
         align-content: center;
     }
+    
     #add-button {
         width: 70%;
-        color: red; /* test */
     }
 }
 
+/* add button */
 #add-button {
-    /* square */
     width: 200px;
     height: 200px;
     background: var(--translucent-black);
     margin: 3rem;
     cursor: pointer;
-
-    /* center the plus */
+    
+    /* Center the plus sign */
     display: flex;
     justify-content: center;
-    font-style: sans-serif;
     align-items: center;
-
-    /* plus sign look */
+    font-style: sans-serif;
+    
+    /* Plus sign styling */
     font-size: 200px;
     font-weight: bold;
-    color: rgba(128,128,128,0.6);
+    color: rgba(128, 128, 128, 0.6);
 }
 
-/* centering the plus */
 #add-button span {
     padding-bottom: 35px;
     user-select: none;
@@ -60,129 +56,34 @@
     background-color: rgba(42, 42, 42, 0.808);
 }
 
-/* Card */
+/* card overrides on forms.css */
 .profile-box {
+    /* Override card dimensions for signal instances */
     max-width: 200px;
-    max-height: 100vh;
-    width: 100%;
-    overflow-y: auto;
-
-    padding: 20px 20px 20px;
-    background: var(--bg-panel);
-    border-radius: 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, .15);
-
-    display: flex;
-    flex-direction: column;
+    padding: 20px;
+    margin: -10px -20px 20px; /* Adjusted for new padding */
 }
 
-.selection-control {
-    display: inline-block;
-}
-
-#message {
-    color: red
-}
-
-/* Card Header */
 .panel-header {
-    background: var(--brand-maroon);
-    color: #fff;
-    font: 200 1.6rem/1.1 "comfortaa";
-    padding: 1rem 1rem 0.5rem;
-    margin: -10px -35px 20px; 
-    border-radius: 0;
+    /* Adjust header margins for new card padding */
+    margin: -10px -20px 20px;
 }
 
-/* Form Layout */
-.profile-form {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
-}
-
-.form-group {
-    margin-bottom: 0.3rem;
-}
-
-.form-check {
-    margin: -0.4rem 0;
+/* form overrides */
+.signal-form {
+    margin: 2rem;
 }
 
 .signal-form select {
     margin: 0.5rem;
 }
 
-.signal-form {
-    margin: 2rem
-}
-
-/* Inputs */
-.form-control {
-    height: 42px; 
-    background: #fff;
-    border: 1px solid var(--border-input);
-    border-radius: 0;
-    padding: 0.5rem 0.75rem;
-    font-size: 1.05rem;
-    color: var(--text-main);
-}
-
-.form-control::placeholder {
-    color: var(--placeholder);
-    opacity: 0.5;
-}
-
-.form-control:focus::placeholder { color: transparent; }
-
-.form-control:focus {
-    border-color: #2684ff;
-    outline: 0;
-    box-shadow: 0 0 0 2px rgba(38, 132, 255, .25);
-}
-
-/* Helper Text */
-.message {
-    color: red
-}
-
-.text-muted {
-    color: var(--text-main);
-    font-size: 0.9rem;
-}
-
-/* Button */
 .btn-primary {
-    background: var(--brand-maroon);
-    border: none;
-    border-radius: 0;
-    width: 100%;
-    padding: 0.9rem 1rem;
-    font-weight: 700;
+    /* Add specific font-size for signal buttons */
     font-size: 15px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin-top: auto; /* stick to bottom of card */
-}
-
-.btn-primary:hover,
-.btn-primary:focus {
-    background: var(--brand-maroon-hover);
-}
-
-.edit-button {
-    margin-top: 2rem;
-    color: var(--brand-maroon);
-    border-color:  var(--brand-maroon);
 }
 
 .edit-button:hover {
-    background-color: var(--brand-maroon);
-    border: var(--brand-maroon);
-}
-
-/* ---------- Checkbox ---------- */
-.form-check-label {
-    font-weight: normal !important;
+    /* Add missing color property */
+    color: white;
 }

@@ -26,7 +26,6 @@ things i dont want to forget about when im polishing
     + 1 seat signal per user-session
 -when shipping into an actual web app on my vps, use either a multi-container set up that also launches process_tasks or set up honcho
     for now im running python manage.my process_tasks with my app
--my number got labeled scam likely... might have to purchase another from twilio and/or get whitelisted by carrier
 -if this app scales to many more users, i should switch to something like telnyx that charges per-second. rn per-minute costs
     are making this expensive.
 -security stuff, including sha 384 
@@ -35,9 +34,8 @@ things i dont want to forget about when im polishing
 -dont let register before checking box
 -edit button for profiel, deleting profile
 -do some editing for background image
--Make seat_signal.css inherit from profile and also fix the blue buttons together
 
--make utils.py for seatsignal app
+-Make seat_signal.css inherit from profile and also fix the blue buttons together
 -enforce signal cap and duplicates client/frontend (rn, when u add duplicate, it adds n+1 duplicates)
 -fix imgur not working either
 -refactor tasks.py for scale: have only one running regardless of seat signals, and let it check all people's signals through ONE api call to C@B instead of linearly scaling with signals (note that i havent verified that deletion carries over to the background task. in refactor, make sure that signals checked are based on current existent objects for model seatsignal, so that it does)

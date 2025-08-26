@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block head %}
+        <link rel="stylesheet" href="{% static 'core/forms.css' %}">
         <link rel="stylesheet" href="{% static 'seat-signal/seat_signal.css' %}">
         <script>
             window.watchCourseUrl = "{% url 'watch_course' %}";
@@ -27,12 +28,10 @@
     </template>
 
     <div class="profile-box signal-form d-none" id="signal-form">
-        <div id="message"></div>
-
         <select id="sem-selection">
             <option value="">-- Semester --</option>
             {% for sem_id, sem_label in recent_sems %}
-                <option value="{{ sem_id }}">{{ sem_label }}</option>
+                <option value="{{ sem_id }}" data-sem-label="{{ sem_label }}">{{ sem_label }}</option>
             {% endfor %}
         </select>
 
@@ -61,6 +60,8 @@
                 Text me
             </label>
         </div> -->
+
+        <div class="message"></div>
 
         <div class="form-group">
             <button type="submit" class="btn btn-primary start">Watch Course</button>
