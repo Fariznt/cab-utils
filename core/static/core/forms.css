@@ -89,12 +89,22 @@
     margin-top: auto; /* stick to bottom of card */
 }
 
-.btn-primary:hover,
 .btn-primary:focus {
+    background: var(--brand-maroon);
+    box-shadow: none !important;
+}
+
+.btn-primary:active {
+    background-color: var(--brand-maroon) !important;
+    border-color: var(--brand-maroon) !important;
+}
+
+.btn-primary:hover {
     background: var(--brand-maroon-hover);
 }
 
-.edit-button {
+/* possible CSS for future edit buttons */
+/* .edit-button {
     margin-top: 2rem;
     color: var(--brand-maroon);
     border-color:  var(--brand-maroon);
@@ -104,9 +114,9 @@
     color:white;
     background-color: var(--brand-maroon);
     border: var(--brand-maroon);
-}
+} */
 
-/* ---------- Checkbox ---------- */
+/* checkbox */
 .form-check-label {
     font-weight: normal !important;
 }
