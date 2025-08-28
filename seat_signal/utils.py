@@ -50,22 +50,3 @@ def get_sem_id(sem_str: str) -> str:
     term_id = term_names[sem_str[:-5]]
 
     return year + term_id
-
-def get_twilio_credentials():
-    """
-    Background task helper that retrieves Twilio account sid, auth token, and the number 
-    to call with from .env file in project root.
-    """
-    PROJECT_DIR = Path(__file__).resolve().parent.parent
-    loaded = load_dotenv(PROJECT_DIR/".env")
-    if not loaded:
-        raise FileNotFoundError(
-            ".env not found in project root. Create a .env file and define " \
-            "ACCOUNT_SID, AUTH_TOKEN, FROM_NUMBER associated with your Twilio account."
-        )
-    
-    ACCOUNT_SID = os.getenv("ACCOUNT_SID")
-    AUTH_TOKEN = os.getenv("AUTH_TOKEN")
-    FROM_NUMBER = os.getenv("FROM_NUMBER")
-
-    return ACCOUNT_SID, AUTH_TOKEN, FROM_NUMBER

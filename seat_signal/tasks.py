@@ -7,9 +7,7 @@ from twilio.rest import Client
 from twilio.twiml.voice_response import VoiceResponse
 from core.models import CourseSession, User
 from seat_signal.models import SeatSignal
-from pathlib import Path
-from dotenv import load_dotenv
-import os
+from django.conf import settings
 
 @background(schedule=0) # begin immediately, repeat every 10 seconds
 def watch_task(crn, number, contact_method, repeat=10, repeat_until=None):
@@ -60,11 +58,10 @@ def send_signal(crn, to_number, contact_method) -> None:
         voice_resp.pause(length=1.5)
         voice_resp.say(msg, voice="alice")
         # Create client & call
-        ACCOUNT_SID, AUTH_TOKEN, FROM_NUMBER = utils.get_twilio_credentials()
-        client = Client(ACCOUNT_SID, AUTH_TOKEN)
+        client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
         call = client.calls.create(
             to=to_number, 
-            from_= FROM_NUMBER,
+            from_= settings.FROM_NUMBER,
             twiml = voice_resp.to_xml()
         )
     elif contact_method == 'text':

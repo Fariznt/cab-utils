@@ -8,6 +8,7 @@
             window.watchCourseUrl = "{% url 'watch_course' %}";
             window.getAuthUrl = "{% url 'get_auth' %}";
             window.getSessionsUrl = "{% url 'get_signal_sessions' %}";
+            window.signalCap = "{{ signal_cap }}"
             window.csrftoken = "{{ csrf_token }}";
         </script>
         <script defer src="{% static 'seat-signal/seat_signal.js' %}" defer></script>
@@ -15,8 +16,8 @@
 
 {% block body %}
 <div class="signal-page">
-    <template id="filled-form">
-        <div class="profile-box signal-form">
+    <template id="filled-form-tpl">
+        <div class="profile-box signal-form filled-form">
             <select disabled><option class="signal-sem-val"></option></select>
             <select disabled><option class="signal-code-val"></option></select>
             <select disabled><option class="signal-section-val"></option></select>

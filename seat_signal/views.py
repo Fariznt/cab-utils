@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.core.exceptions import MultipleObjectsReturned
 import seat_signal.utils as utils
 import json
+from django.conf import settings
 
 def ss_view(request):
     """
@@ -36,7 +37,8 @@ def ss_view(request):
     return render(request, 'seat_signal.html', {
         'codes': codes,
         'sections': sections,
-        'recent_sems': recent_sems
+        'recent_sems': recent_sems,
+        'signal_cap': settings.SIGNAL_CAP
     })
 
 def watch_course(request):
@@ -46,6 +48,12 @@ def watch_course(request):
 
     if not request.user.is_authenticated:
         return JsonResponse({'status': 'failure', 'message': 'User not authenticated'})
+
+    # Enforce cap on seat signals per phone number
+    # good frontend code prevents this but backend validation is critical due to twilio costs
+    if SeatSignal.objects.filter(user=request.user).count() >= int(settings.SIGNAL_CAP):
+        return JsonResponse({'status': 'failure', 'message': 'You have reached the cap on watched courses!'})
+
     
     # Pull expected parameters
     sem_id = request.POST['sem_id']
@@ -56,7 +64,7 @@ def watch_course(request):
     # Validate that expected parameters are defined
     for name, val in (('sem_id', sem_id), ('code', code), ('section', section), ('contact_method', contact_method)):
         if not val:
-            return JsonResponse({'status': 'failure', 'message': f'Missing parameter: {name}'}, status=400)
+            return JsonResponse({'status': 'failure', 'message': f'An unexpected error occured'}, status=400)
     if contact_method not in ('call', 'text', 'both'):
         return JsonResponse({'status': 'failure', 'message': 'Invalid contact method'})
 
@@ -71,15 +79,20 @@ def watch_course(request):
 
     # Create signal / start watching the course session
     try:
-        new_seat_signal = SeatSignal(user = request.user, session = session)
-        new_seat_signal.save()
+        new_seat_signal, created = SeatSignal.objects.get_or_create(
+            user = request.user,
+            session = session
+        )
 
-        number = request.user.phone_num
+        if created:
+            number = request.user.phone_num
+            #watch_task(session.crn, number, contact_method)
+            return JsonResponse({'status': 'success', 'message': 'Watching course, crn:' + session.crn})
+        else:
+            return JsonResponse({'status': 'failure', 'message': 'Already watching this course session!'}, status=400)
 
-        #watch_task(session.crn, number, contact_method)
-        return JsonResponse({'status': 'success', 'message': 'Watching course, crn:' + session.crn})
     except Exception as e:
-        return JsonResponse({'status': 'failure', 'message': f'Error: {e}'})
+        return JsonResponse({'status': 'failure', 'message': f'An unexpected error occured'}, status=400)
     
 def stop_watching_course(request, semester, code, section):
     """

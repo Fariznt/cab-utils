@@ -34,15 +34,17 @@ things i dont want to forget about when im polishing
 -dont let register before checking box
 -edit button for profiel, deleting profile
 -do some editing for background image
+-logging error details officially. bc error messages are sort of reserved for nontechnical users
 
--Make seat_signal.css inherit from profile and also fix the blue buttons together
--enforce signal cap and duplicates client/frontend (rn, when u add duplicate, it adds n+1 duplicates)
+-phone number validation during registration with library phonenumbers 
 -fix imgur not working either
 -refactor tasks.py for scale: have only one running regardless of seat signals, and let it check all people's signals through ONE api call to C@B instead of linearly scaling with signals (note that i havent verified that deletion carries over to the background task. in refactor, make sure that signals checked are based on current existent objects for model seatsignal, so that it does)
     also make the single task a heartbeat task asw---have it cache the timezone.now() so i can check in django code to see if its running (allowing error handling)
     also at the same time add buffer to calls arent spammed and i dont end up on a scam likely list
     exception handling in watch_tasks
--security stuff
+-security stuff:
+    -the app right now is sort of susceptible to malicious users, because while there is per-user caps on usage, people can easily make multiple accounts, with or without valid phone numbers. if someone
+    (for whatever reason) makes a script to automate user creation and seat signal making, it could stress my vps, clog up signal activation, and use twilio credits
 -restfulify and make more secure and consistent my API
 
 -barebones prereq map
@@ -53,6 +55,9 @@ things i dont want to forget about when im polishing
 
 IMPORTANT README TO-INCLUDE INFO:
 "Want to extend my app? Don't forget to create a .env file and define your own values for..."
+-decided to not include frontend-specific validation. frontend is raw js so i didnt want unwanted complexity + backend validation is quick and routes user-friendly error message fine
+-talk about why chose simple js and scope creep.
+
 
 FRONTEND PLAN
 make navigation bar + background image darker with scrolling

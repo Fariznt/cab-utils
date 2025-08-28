@@ -2,12 +2,14 @@ const csrftoken = window.csrftoken;
 const watchCourseUrl = window.watchCourseUrl;
 const getAuthUrl = window.getAuthUrl;
 const getSessionsUrl = window.getSessionsUrl;
+const signalCap = window.signalCap;
 const deleteUrlTpl = 'api/seat-signals/SEM_PLACEHOLDER/CODE_PLACEHOLDER/SEC_PLACEHOLDER/';
 
 const container = document.querySelector('.signal-page');
 const addBtn = container.querySelector('#add-button');
 const form = container.querySelector('#signal-form');
-const filledFormTpl = document.querySelector('#filled-form');
+const filledFormTpl = document.querySelector('#filled-form-tpl');
+const errorMessage = document.querySelector('.message');
 
 // Load in user info
 let loggedIn = false
@@ -79,12 +81,10 @@ function deleteSignal(semester, code, section, event) {
     formToDelete.remove()
 
     // Make call to remove on backend
-    console.log(deleteUrlTpl)
     const deleteUrl = deleteUrlTpl
     .replace("SEM_PLACEHOLDER", `${semester}`)
     .replace("CODE_PLACEHOLDER", `${code}`)
     .replace("SEC_PLACEHOLDER", `${section}`)
-    console.log(deleteUrl)
 
     fetch(deleteUrl, {
         method: 'DELETE',
@@ -97,18 +97,24 @@ function deleteSignal(semester, code, section, event) {
             console.error('Delete failed:', response.status);
         }
     });
+
+    // bring back add button if applicable
+    addBtn.classList.remove('d-none')
 }
 
 function addSignalForm() {
     // remove add button (until submission)
     addBtn.classList.add('d-none');
 
+    // remove old error messages
+    errorMessage.innerHTML = '';
+
     // show new signal form
     form.classList.remove('d-none');
 
     // set the form to receive submission
     const startBtn = container.querySelector('.start');
-    startBtn.addEventListener('click', () => submitSignalForm());
+    startBtn.addEventListener('click', submitSignalForm);
 }
 
 function submitSignalForm() {
@@ -119,51 +125,39 @@ function submitSignalForm() {
     section = document.querySelector('#section-selection').value
     // contactMethod = ... currently not implemented
 
-    if (validateInput(sem_id, code, section)) {
-        // create form using what the user selected
-        const formData = new FormData();
-        formData.append('sem_id', sem_id);
-        formData.append('code', code);
-        formData.append('section', section);
-        formData.append('contact_method', 'call'); // hardcoded for now as there is no backend for texting
+    // create form using what the user selected
+    const formData = new FormData();
+    formData.append('sem_id', sem_id);
+    formData.append('code', code);
+    formData.append('section', section);
+    formData.append('contact_method', 'call'); // hardcoded for now as there is no backend for texting
 
-        // post new seat signal (use watch_course)
-        fetch(watchCourseUrl, {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: {
-                'X-CSRFToken': csrftoken
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (result.status == 'failure') {
-                document.querySelector('.message').innerHTML = result.message
-            } else if (result.status == 'success') {
-                // remove form used to add signal
-                form.classList.add('d-none');
+    // post new seat signal (use watch_course)
+    fetch(watchCourseUrl, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.status == 'failure') {
+            errorMessage.innerHTML = result.message // error descriptor from backend validation
+        } else if (result.status == 'success') {
+            // remove form used to add signal
+            form.classList.add('d-none');
 
-                // add the completed form to loaded forms
-                loadFilledForm(sem_label, code, section)
+            // add the completed form to loaded forms
+            loadFilledForm(sem_label, code, section)
 
-                // bring back add button
-                if (!reachedSignalCap()) {
-                    addBtn.classList.remove('d-none')
-                }
+            // bring back add button
+            if (document.querySelectorAll('.filled-form').length < signalCap) {
+                addBtn.classList.remove('d-none')
             }
-        })
-    }
-}
-
-function validateInput(sem_id, code, section) {
-    // TODO code to validate input, if anything bad display message on screen
-    return true; // all valid for now
-}
-
-function reachedSignalCap() {
-    // TODO use api to check if reached
-    return false;
+        }
+    })
 }
 
 // Get CSRF token

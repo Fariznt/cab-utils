@@ -10,8 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -130,3 +131,28 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Load .env variables (likely-to-be-configured and sensitive variables not defined in rest of django project)
+PROJECT_DIR = Path(__file__).resolve().parent.parent
+loaded = load_dotenv(PROJECT_DIR/".env")
+if not loaded:
+    raise FileNotFoundError(
+        ".env not found in project root. Create a .env file and define " \
+        "ACCOUNT_SID, AUTH_TOKEN, FROM_NUMBER, SIGNAL_CAP."
+    )
+
+required_vars = ["ACCOUNT_SID", "AUTH_TOKEN", "FROM_NUMBER", "SIGNAL_CAP"]
+missing_vars = []
+
+# Check for missing variables
+for var_name in required_vars:
+    if not os.getenv(var_name):
+        missing_vars.append(var_name)
+if missing_vars:
+    raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
+    
+
+ACCOUNT_SID = os.getenv("ACCOUNT_SID")
+AUTH_TOKEN = os.getenv("AUTH_TOKEN")
+FROM_NUMBER = os.getenv("FROM_NUMBER")
+SIGNAL_CAP = os.getenv("SIGNAL_CAP")

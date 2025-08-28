@@ -7,4 +7,10 @@ class SeatSignal(models.Model):
     session = models.ForeignKey(CourseSession, on_delete=models.PROTECT, related_name='session_signals')
     datetime_created = models.DateTimeField(auto_now_add=True)
     
-    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'session'],
+                name='unique_user_session_signal'
+            )
+        ]
