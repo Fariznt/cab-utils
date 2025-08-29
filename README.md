@@ -35,15 +35,13 @@ things i dont want to forget about when im polishing
 -do some editing for background image
 -logging error details officially. bc error messages are sort of reserved for nontechnical users
 -deal with scam likely number
-
--get rid of the list of srcdbs idk where its from
--refactor tasks.py for scale: have only one running regardless of seat signals, and let it check all people's signals through ONE api call to C@B instead of linearly scaling with signals (note that i havent verified that deletion carries over to the background task. in refactor, make sure that signals checked are based on current existent objects for model seatsignal, so that it does)
-    also make the single task a heartbeat task asw---have it cache the timezone.now() so i can check in django code to see if its running (allowing error handling)
+-also make the single task a heartbeat task asw---have it cache the timezone.now() so i can check in django code to see if its running (allowing error handling)
     also at the same time add buffer to calls arent spammed and i dont end up on a scam likely list
     exception handling in watch_tasks
 
-    turns out one api call wasnt possible in the first place. in the end, my architectural change will be functionally useless (only help for one call for popular courses multiple ppl watch),
-    but is still slightly more intelligent design because it syncs seat signals objects with watching more directly and makes rate limiting easier and gives more control
+-get rid of the list of srcdbs idk where its from
+-calling multiple numbers didnt work. gotta do smth about that
+-process deletes itself afterwards for some reason
 -enforce number uniqueness, but if people forget their password its problematic. so address either with password reset option through also adding emails, or some other verifcation method (ex. directly the number)
 -phone number validation during registration with library phonenumbers 
 -fix imgur not working either
