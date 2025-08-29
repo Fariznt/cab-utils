@@ -1,4 +1,4 @@
-def get_recent_sems(sem_ids: list[str], n: int = 2) -> list[str]:
+def get_recent_sems(sem_ids: list[str], n: int = 4) -> list[str]:
     """
     View helper that takes a list of semester ids (e.g. 202510) and returns a list of the n most recent semesters as a tuple including 
     a readable version of the semester representation e.g. (202510, Fall 2025)

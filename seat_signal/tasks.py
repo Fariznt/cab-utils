@@ -8,61 +8,67 @@ from twilio.twiml.voice_response import VoiceResponse
 from core.models import CourseSession, User
 from seat_signal.models import SeatSignal
 from django.conf import settings
+from core.models import CourseSession
+from core.models import User
 
 @background(schedule=0) # begin immediately, repeat every 10 seconds
-def watch_task(crn, number, contact_method, repeat=10, repeat_until=None):
-    """Polls the C@B API to check for seat availability. If there's a seat, contacts the user."""
+def enable_seat_signal(repeat=10, repeat_until=None):
+    """
+    Background task that asynchronously polls C@B API for seat availability based on current SeatSignals in database
+    """
+    print("func called, prints working")
+    # loop over all sessions referenced by a seat signal
+    sessions_w_signal = CourseSession.objects.filter(session_signals__isnull=False).distinct()
+    print(str(sessions_w_signal))
+    for session in sessions_w_signal: 
+        print("looped")
+        # Get seat availability            
+        payload = {
+            'key': 'crn:' + str(session.crn)
+        }
+        url = "https://cab.brown.edu/api/?page=fose&route=details"
+        response = requests.post(url, json=payload)
+        course_details = response.json()
+        seats_string = course_details['seats'].partition('<span class="seats_avail">')[2].partition('</span>')[0]
 
-    # Get course session details from C@B's API
-    payload = {
-        'key': 'crn:' + crn
-    }
-    url = "https://cab.brown.edu/api/?page=fose&route=details"
-    response = requests.post(url, json=payload)
-    course_details = response.json()
+        if seats_string != "0":
+            print("noticed seat availability")
+            # Get users to notify
+            users = User.objects.filter(
+                id__in=session.session_signals.values_list('user_id', flat=True)
+            )
+            print(f'users: {str(users)}')
+            # Notify them
+            for user in users:
+                # update database
+                SeatSignal.objects.filter(
+                    user=user, 
+                    session=session
+                ).delete()
+                # Contact user
+                print(user.phone_num) # temp
+                send_signal(session.crn, user.phone_num)
 
-    # Get seat count for this session as a string; empty string if uncapped
-    seats_string = course_details['seats'].partition('<span class="seats_avail">')[2].partition('</span>')[0]
+def send_signal(crn, to_number) -> None:
+    """Notifies the user (by call) of an open seat in the session they had SeatSignal watching"""
+    # Create call voice message string
+    session = CourseSession.objects.get(crn=crn)
+    course_title = session.title
+    section = session.section
+    msg = (
+        f"Seat Signal has detected an open seat for {course_title} "
+        f"<break time='0.3s'/> section {section}."
+        "<break time='1s'/> Proceed to registration."
+    )
+    # Create call voice message
+    voice_resp = VoiceResponse()
+    voice_resp.pause(length=1.5)
+    voice_resp.say(msg, voice="alice")
+    # Create client & call
+    client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
+    call = client.calls.create(
+        to=to_number, 
+        from_= settings.FROM_NUMBER,
+        twiml = voice_resp.to_xml()
+    )
 
-    if seats_string == "" or seats_string != "0":
-        Task.objects.filter(
-            task_name = 'watch_task',
-            task_params = json.dumps([crn, number])
-        ).delete()
-
-        # Update seat signal database
-        SeatSignal.objects.filter(
-            user=User.objects.get(phone_num=number), 
-            session=CourseSession.objects.get(crn=crn)
-        ).delete()
-
-        # Contact user
-        send_signal(crn, number, contact_method)
-
-    # else: continue watching for open seats
-
-def send_signal(crn, to_number, contact_method) -> None:
-    """Notifies the user (by text/call) of an open seat in the session they had SeatSignal watching"""
-    if contact_method == 'call':
-        # Create call voice message string
-        session = CourseSession.objects.get(crn=crn)
-        course_title = session.title
-        section = session.section
-        msg = (
-            f"Seat Signal has detected an open seat for {course_title} "
-            f"<break time='0.3s'/> section {section}."
-            "<break time='1s'/> Proceed to registration."
-        )
-        # Create call voice message
-        voice_resp = VoiceResponse()
-        voice_resp.pause(length=1.5)
-        voice_resp.say(msg, voice="alice")
-        # Create client & call
-        client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
-        call = client.calls.create(
-            to=to_number, 
-            from_= settings.FROM_NUMBER,
-            twiml = voice_resp.to_xml()
-        )
-    elif contact_method == 'text':
-        pass #Not currently supported. If statement exists only to provide infrastructure for later addition

@@ -7,21 +7,19 @@ class Command(BaseCommand):
         + '\nE.g. "python manage.py update_db 202410" to update Fall 2025.'
 
     def add_arguments(self, parser):
-        parser.add_argument('sem_id', type=int, help=
-                            'Semester ID sem_id is 00 (Summer), 10 (Fall), 15 (Winter), or 20 (Spring) appended to the year.')
+        parser.add_argument('search_id', type=int, help=
+                            'search_id is a semester identifier 00 (Summer), 10 (Fall), 15 (Winter), or 20 (Spring)' \
+                            ' appended to the year, or 99999 for four "current" semesters on C@B at once.')
 
     def handle(self, *args, **options):
         self.stdout.write("Beginning database update")
 
-        SEM_ID = options['sem_id']
-
-        # delete course data for given semester if it exists
-
+        search_id = options['search_id']
 
         # Fetch given semester's courses
         search_payload = {
             "other": {
-                "srcdb": SEM_ID
+                "srcdb": search_id
             },
             "criteria": [
                 {
@@ -47,7 +45,8 @@ class Command(BaseCommand):
             code = course_datum.get('code')
             section = course_datum.get('no')
             title = course_datum.get('title')
-            new_session = CourseSession(crn=crn, code=code, section=section, sem_id=SEM_ID, title = title)
+            sem_id = course_datum.get('srcdb')
+            new_session = CourseSession(crn=crn, code=code, section=section, sem_id=sem_id, title = title)
             new_session.save()
 
         self.stdout.write("Database update complete.")        

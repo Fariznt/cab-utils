@@ -14,6 +14,7 @@ for now, im deferring texting functionality (Due to cost on twilio), but want to
     if i add texting, i should probably use voips for lower cost.
 
 things i dont want to forget about when im polishing
+-in the future, maybe reduce the load on C@B api by perhaps going by individual departments or some other identifier to bulk fetch course seat availability. not sure if possible
 -definitely want to do a tiny bit of unit testing at least on the API. MAYBE cb later for selenium if its particularly valuable
 -validate phone numbers server+client side, probably with preexisting packages
 -encrypt passwords
@@ -22,8 +23,6 @@ things i dont want to forget about when im polishing
 -prevent duplicate numbers when watching a seat
 -if i ship this fully into production for student use, i need backups for the database, plus figure moving databases in and out without
     pushing sensitive info onto a public repo (scp? django commands?)
--do to the way seat signal is written, need to verify only 1-1 relationship between users and numbers in db and in input validation
-    + 1 seat signal per user-session
 -when shipping into an actual web app on my vps, use either a multi-container set up that also launches process_tasks or set up honcho
     for now im running python manage.my process_tasks with my app
 -if this app scales to many more users, i should switch to something like telnyx that charges per-second. rn per-minute costs
@@ -35,20 +34,28 @@ things i dont want to forget about when im polishing
 -edit button for profiel, deleting profile
 -do some editing for background image
 -logging error details officially. bc error messages are sort of reserved for nontechnical users
+-deal with scam likely number
 
--phone number validation during registration with library phonenumbers 
--fix imgur not working either
+-get rid of the list of srcdbs idk where its from
 -refactor tasks.py for scale: have only one running regardless of seat signals, and let it check all people's signals through ONE api call to C@B instead of linearly scaling with signals (note that i havent verified that deletion carries over to the background task. in refactor, make sure that signals checked are based on current existent objects for model seatsignal, so that it does)
     also make the single task a heartbeat task asw---have it cache the timezone.now() so i can check in django code to see if its running (allowing error handling)
     also at the same time add buffer to calls arent spammed and i dont end up on a scam likely list
     exception handling in watch_tasks
+
+    turns out one api call wasnt possible in the first place. in the end, my architectural change will be functionally useless (only help for one call for popular courses multiple ppl watch),
+    but is still slightly more intelligent design because it syncs seat signals objects with watching more directly and makes rate limiting easier and gives more control
+-enforce number uniqueness, but if people forget their password its problematic. so address either with password reset option through also adding emails, or some other verifcation method (ex. directly the number)
+-phone number validation during registration with library phonenumbers 
+-fix imgur not working either
 -security stuff:
     -the app right now is sort of susceptible to malicious users, because while there is per-user caps on usage, people can easily make multiple accounts, with or without valid phone numbers. if someone
     (for whatever reason) makes a script to automate user creation and seat signal making, it could stress my vps, clog up signal activation, and use twilio credits
 -restfulify and make more secure and consistent my API
+-would be better to base available courses to select on current year. can be remedied simply by basing the db as a whole on current year as given by sem id 99999 or smth
 
 -barebones prereq map
 -homepage readme barebones
+-django development server is not recommended in production. and current dockerfile is temporary solution for runnig the needed sequence of commands. switch to docker compose in prod
 -final security polish, and ship
 
 

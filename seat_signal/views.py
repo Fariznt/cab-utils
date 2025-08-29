@@ -1,9 +1,7 @@
 from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
 from core.models import CourseSession
-from seat_signal.tasks import watch_task
 from seat_signal.models import SeatSignal
-from django.db.models.functions import Substr
 from django.db.models import Q
 from django.core.exceptions import MultipleObjectsReturned
 import seat_signal.utils as utils
@@ -15,7 +13,8 @@ def ss_view(request):
     The only view that renders a page for the Seat Signal app. Frontend js handles any UI changes using API views below
     """
     sems = list(CourseSession.objects.values_list('sem_id', flat=True).distinct())
-    recent_sems = utils.get_recent_sems(sems) # list of ruples e.g. ('202510', 'Fall 2025')
+    print(list(CourseSession.objects.values_list('sem_id', flat=True)))
+    recent_sems = utils.get_recent_sems(sems) # list of tuples e.g. ('202510', 'Fall 2025')
 
     sessions = CourseSession.objects.all()
     codes = (
@@ -72,7 +71,7 @@ def watch_course(request):
     try:
         session = CourseSession.objects.get(code=code, section=section, sem_id=sem_id)
     except CourseSession.DoesNotExist:
-        return JsonResponse({'status': 'failure', 'message': 'Session does not exist!'})
+        return JsonResponse({'status': 'failure', 'message': 'Session does not exist in relevant semesters!'})
     except MultipleObjectsReturned:
         return JsonResponse({'status': 'failure', 
                              'message': f'Multiple course sessions satisfy this code, section, and semester.'})
@@ -85,8 +84,6 @@ def watch_course(request):
         )
 
         if created:
-            number = request.user.phone_num
-            #watch_task(session.crn, number, contact_method)
             return JsonResponse({'status': 'success', 'message': 'Watching course, crn:' + session.crn})
         else:
             return JsonResponse({'status': 'failure', 'message': 'Already watching this course session!'}, status=400)
