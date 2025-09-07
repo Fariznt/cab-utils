@@ -38,6 +38,8 @@ things i dont want to forget about when im polishing
 -also make the single task a heartbeat task asw---have it cache the timezone.now() so i can check in django code to see if its running (allowing error handling)
     also at the same time add buffer to calls arent spammed and i dont end up on a scam likely list
     exception handling in watch_tasks
+-give direct query access to my database
+
 
 -get rid of the list of srcdbs idk where its from
 -calling multiple numbers didnt work. gotta do smth about that
@@ -55,6 +57,7 @@ things i dont want to forget about when im polishing
 -homepage readme barebones
 -django development server is not recommended in production. and current dockerfile is temporary solution for runnig the needed sequence of commands. switch to docker compose in prod
 -final security polish, and ship
+
 
 
 

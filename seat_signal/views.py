@@ -13,7 +13,6 @@ def ss_view(request):
     The only view that renders a page for the Seat Signal app. Frontend js handles any UI changes using API views below
     """
     sems = list(CourseSession.objects.values_list('sem_id', flat=True).distinct())
-    print(list(CourseSession.objects.values_list('sem_id', flat=True)))
     recent_sems = utils.get_recent_sems(sems) # list of tuples e.g. ('202510', 'Fall 2025')
 
     sessions = CourseSession.objects.all()
