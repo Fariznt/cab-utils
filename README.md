@@ -2,8 +2,6 @@
 
 A hub of course registration utilities for Brown University developed as a Django monolith with a simple frontend running asynchronous services. 
 
----
-
 ## Overview
 
 This web app is intended as a collection of utilities brought together under one hub. Currently, development has only reached links to existing utilities (ex. Critical Review for course reviews), one unique utility (Seat Signal), and some incomplete concepts (visualization of course prerequisite relations, course offering trends, stronger course search engine).
@@ -12,10 +10,10 @@ In general, this web app was developed by reverse-engineering Brown University's
 
 ---
 
-## Utilities
+# Utilities
 (Links to sites I didn't make but are connected to CAB Utils are not included here)
 
-# Seat signal
+## Seat signal
 
 The primary utility that is done being implemented and not seen elsewhere is Seat Signal, an application that allows you to track multiple classes and receive a direct call when a seat opens up. This solves a common problem on campus, and does so greater than its competitor (Coursicle) by
 a. Allowing tracking of 5 instead of only 1 class for free (or very cheap, if you run the webapp yourself)
@@ -23,7 +21,7 @@ b. Sending a call with an informative voice message, instead of a mere notificat
 
 Seat signal works by letting users add courses through their account, and running an asynchronous polling of the C@B API for seat count, and using [Twilio](https://www.twilio.com/docs) to send a call when a seat opens up for any user.
 
-# Prereq Map
+## Prereq Map
 
 A course prerequisite visualizer. Queries course descriptions and uses string parsing to infer course dependencies (the C@B API simply does not provide this directly). Then, visualizes these dependencies in a tree.
 
@@ -31,7 +29,7 @@ This is not yet offerred in the web app, but the core backend software that GETs
 
 ---
 
-## Roadmap before launch
+# Roadmap before launch
 
 This web app is functional, and has been deployed on a VPS previously for testing. Anyone is welcome to pull and run it themselves. In fact, I've run it in dev to use its utility myself already. Before launching as a webapp for wider use, there's some work that is absolutely necessary:
 
@@ -40,7 +38,7 @@ This web app is functional, and has been deployed on a VPS previously for testin
     - This type of calling gets callers labeled as Scam Likely, and steps need to be taken to ensure call reputation and prevent mobile carrier blocking
 - Homepage text (mostly user-friendly version of REAMDE stuff)
 
-## Possible Improvements
+# Possible Improvements
 
 Improvements (not absolutely necessary, but imporant for scale):
 - [voIP.ms](https://voip.ms/) for texting functionality, including scheduling and canceling Seat Signal by text (Twilio is too expensive for free hosting)
