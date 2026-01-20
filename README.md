@@ -1,71 +1,54 @@
-TBD. currently using readme to plan
+# CAB Utils
 
--do a basic frontend in js for seat_signal to get more experience w/ js basics. include array methods and async/await with fetch. 
--navigation bar
--backend polishing
+A hub of course registration utilities for Brown University developed as a Django monolith with a simple frontend running asynchronous services. 
 
-unspecified time in future:
--react/ts lectures
--frontend polishing
--unit testing
+---
 
+## Overview
 
-for now, im deferring texting functionality (Due to cost on twilio), but want to keep the app extensible for texting as a signal method.
-    if i add texting, i should probably use voips for lower cost.
+This web app is intended as a collection of utilities brought together under one hub. Currently, development has only reached links to existing utilities (ex. Critical Review for course reviews), one unique utility (Seat Signal), and some incomplete concepts (visualization of course prerequisite relations, course offering trends, stronger course search engine).
 
-things i dont want to forget about when im polishing
--in the future, maybe reduce the load on C@B api by perhaps going by individual departments or some other identifier to bulk fetch course seat availability. not sure if possible
--definitely want to do a tiny bit of unit testing at least on the API. MAYBE cb later for selenium if its particularly valuable
--validate phone numbers server+client side, probably with preexisting packages
--encrypt passwords
--let people restart it by text upon failure
--privacy policy regarding phone numbers and passwords (not gauranteeing safety of data but gauranteeing it wont be deliberately sold)
--prevent duplicate numbers when watching a seat
--if i ship this fully into production for student use, i need backups for the database, plus figure moving databases in and out without
-    pushing sensitive info onto a public repo (scp? django commands?)
--when shipping into an actual web app on my vps, use either a multi-container set up that also launches process_tasks or set up honcho
-    for now im running python manage.my process_tasks with my app
--if this app scales to many more users, i should switch to something like telnyx that charges per-second. rn per-minute costs
-    are making this expensive.
--security stuff, including sha 384 
--profile elements need renaming in templates
-    clean up css overall. make filled form and regular form class, and then share them w/ seat signal
--dont let register before checking box
--edit button for profiel, deleting profile
--do some editing for background image
--logging error details officially. bc error messages are sort of reserved for nontechnical users
--deal with scam likely number
--also make the single task a heartbeat task asw---have it cache the timezone.now() so i can check in django code to see if its running (allowing error handling)
-    also at the same time add buffer to calls arent spammed and i dont end up on a scam likely list
-    exception handling in watch_tasks
--give direct query access to my database
+In general, this web app was developed by reverse-engineering Brown University's API and database conventions used for the [course registration site](https://cab.brown.edu/) by observing the network calls that occur during course interaction. For example, core/management/commands provides a update_db command that interacts with the API to build a local database of courses, opening up a myriad of possibilities for flexible querying, analyses, and other utilities.
 
+---
 
--get rid of the list of srcdbs idk where its from
--calling multiple numbers didnt work. gotta do smth about that
--process deletes itself afterwards for some reason
--enforce number uniqueness, but if people forget their password its problematic. so address either with password reset option through also adding emails, or some other verifcation method (ex. directly the number)
--phone number validation during registration with library phonenumbers 
--fix imgur not working either
--security stuff:
-    -the app right now is sort of susceptible to malicious users, because while there is per-user caps on usage, people can easily make multiple accounts, with or without valid phone numbers. if someone
-    (for whatever reason) makes a script to automate user creation and seat signal making, it could stress my vps, clog up signal activation, and use twilio credits
--restfulify and make more secure and consistent my API
--would be better to base available courses to select on current year. can be remedied simply by basing the db as a whole on current year as given by sem id 99999 or smth
+## Utilities
+(Links to sites I didn't make but are connected to CAB Utils are not included here)
 
--barebones prereq map
--homepage readme barebones
--django development server is not recommended in production. and current dockerfile is temporary solution for runnig the needed sequence of commands. switch to docker compose in prod
--final security polish, and ship
+# Seat signal
 
+The primary utility that is done being implemented and not seen elsewhere is Seat Signal, an application that allows you to track multiple classes and receive a direct call when a seat opens up. This solves a common problem on campus, and does so greater than its competitor (Coursicle) by
+a. Allowing tracking of 5 instead of only 1 class for free (or very cheap, if you run the webapp yourself)
+b. Sending a call with an informative voice message, instead of a mere notification which is easy to miss
 
+Seat signal works by letting users add courses through their account, and running an asynchronous polling of the C@B API for seat count, and using [Twilio](https://www.twilio.com/docs) to send a call when a seat opens up for any user.
 
+# Prereq Map
 
-IMPORTANT README TO-INCLUDE INFO:
-"Want to extend my app? Don't forget to create a .env file and define your own values for..."
--decided to not include frontend-specific validation. frontend is raw js so i didnt want unwanted complexity + backend validation is quick and routes user-friendly error message fine
--talk about why chose simple js and scope creep.
+A course prerequisite visualizer. Queries course descriptions and uses string parsing to infer course dependencies (the C@B API simply does not provide this directly). Then, visualizes these dependencies in a tree.
 
+This is not yet offerred in the web app, but the core backend software that GETs all course descriptions in a given semester from C@B and parses the course description strings for likely dependencies is complete.
 
-FRONTEND PLAN
-make navigation bar + background image darker with scrolling
+---
+
+## Roadmap before launch
+
+This web app is functional, and has been deployed on a VPS previously for testing. Anyone is welcome to pull and run it themselves. In fact, I've run it in dev to use its utility myself already. Before launching as a webapp for wider use, there's some work that is absolutely necessary:
+
+- Password hashing / phone number encryption and other security features
+- Get the Twilio number currently in use for this webapp verified
+    - This type of calling gets callers labeled as Scam Likely, and steps need to be taken to ensure call reputation and prevent mobile carrier blocking
+- Homepage text (mostly user-friendly version of REAMDE stuff)
+
+## Possible Improvements
+
+Improvements (not absolutely necessary, but imporant for scale):
+- [voIP.ms](https://voip.ms/) for texting functionality, including scheduling and canceling Seat Signal by text (Twilio is too expensive for free hosting)
+- Client-side phone number validation, enforcing uniqueness, "forgot my password" functionality
+- Call throttling
+- Switch to [Telnyx](https://developers.telnyx.com/docs/overview) for reduced per-second cost (Twilio charges per minute)
+- Code quality improvements (better API conventions, CSS)
+
+Features:
+- Use graphviz or similar to finish implementing PreReq map
+- Providing a stronger course search engine than C@B is a big undertaking---provide the ability for devs to directly query the database instead
