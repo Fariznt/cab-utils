@@ -40,11 +40,11 @@ This web app is functional, and has been deployed on a VPS previously for testin
 - Homepage text (mostly user-friendly version of REAMDE stuff)
 
 # I want to run my own. What do I do?
-1. You need .env in the root directory with Twilio credentials (after making an account and paying for some credits) and the cap on the number of Seat Signals (courses being watched for new seats) permitted:
-- ACCOUNT_SID
-- AUTH_TOKEN
-- FROM_NUMBER
-- SIGNAL_CAP
+1. You need .env in the root directory that defines Twilio credentials (after making an account and paying for some credits) and the cap on the number of Seat Signals (courses being watched for new seats) permitted:
+- ACCOUNT_SID=<value>
+- AUTH_TOKEN=<value>
+- FROM_NUMBER=<value>
+- SIGNAL_CAP=<value>
 
 2. Install dependencies in requirements.txt
 - `pip install -r requirements.txt`
@@ -54,18 +54,14 @@ To run in dev:
 - `python manage.py update_db --help` to learn how to create your local C@B database
 - `python manage.py enable_ss` to start running the asynchronous polling service for Seat Signal
 
+# Possible Improvements & Features
 
-
-
-
-# Possible Improvements
-
-Improvements (not absolutely necessary, but imporant for scale):
+Improvements (not absolutely necessary, but imporant for scale and quality):
 - [voIP.ms](https://voip.ms/) for texting functionality, including scheduling and canceling Seat Signal by text (Twilio is too expensive for free hosting)
 - Client-side phone number validation, enforcing uniqueness, "forgot my password" functionality
 - Call throttling
 - Switch to [Telnyx](https://developers.telnyx.com/docs/overview) for reduced per-second cost (Twilio charges per minute)
-- Code quality improvements (better API conventions, CSS)
+- Code quality improvements (better API conventions, CSS organization, as the repo grows)
 
 Features:
 - Use graphviz or similar to finish implementing PreReq map
