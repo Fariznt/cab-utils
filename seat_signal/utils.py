@@ -1,4 +1,4 @@
-def get_recent_sems(sem_ids: list[str], n: int = 4) -> list[str]:
+def get_recent_sems(sem_ids: list[str], n: int = 4) -> list[tuple[str, str]]:
     """
     View helper that takes a list of semester ids (e.g. 202510) and returns a list of the n most recent semesters as a tuple including 
     a readable version of the semester representation e.g. (202510, Fall 2025)
@@ -11,16 +11,27 @@ def get_recent_sems(sem_ids: list[str], n: int = 4) -> list[str]:
         '00': 2, # Summer
         '10': 3  # Fall
     }
-    # sort by year, term_rank
+
+    def sort_key(id: str):
+        academic_year = int(id[:4])
+        term = id[4:]
+
+        # Winter and Spring belong to the *next* calendar year
+        calendar_year = academic_year + 1 if term in {'15', '20'} else academic_year
+
+        return (calendar_year, term_rank.get(term))
+
+    # sort by actual chronological order
     sorted_ids = sorted(
         sem_ids,
-        key = lambda id: (int(id[:4]), term_rank.get(id[4:])),
-        reverse= True
+        key=sort_key,
+        reverse=True
     )
 
     recent_sem_ids = sorted_ids[:n]
     recent_sem_names = [get_sem_str(s) for s in recent_sem_ids]
     return [(recent_sem_ids[i], recent_sem_names[i]) for i in range(len(recent_sem_ids))]
+
 
 def get_sem_str(sem_id: str) -> str:
     """
@@ -32,9 +43,15 @@ def get_sem_str(sem_id: str) -> str:
         '00': 'Summer',
         '10': 'Fall'
     }
-    term = term_names[sem_id[4:]]
-    year = sem_id[:4]
+    term_code = sem_id[4:]
+    term = term_names[term_code]
+    academic_year = int(sem_id[:4])
+
+    # Winter and Spring are in the next calendar year
+    year = academic_year + 1 if term_code in {'15', '20'} else academic_year
+
     return f'{term} {year}'
+
 
 def get_sem_id(sem_str: str) -> str:
     """
@@ -46,7 +63,12 @@ def get_sem_id(sem_str: str) -> str:
         'Summer': '00',
         'Fall': '10'
     }
-    year = sem_str[5:]
-    term_id = term_names[sem_str[:-5]]
 
-    return year + term_id
+    term, year = sem_str.split()
+    year = int(year)
+    term_id = term_names[term]
+
+    # Winter and Spring belong to the academic year that started the previous calendar year
+    academic_year = year - 1 if term in {'Winter', 'Spring'} else year
+
+    return str(academic_year) + term_id
