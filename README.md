@@ -16,10 +16,11 @@ In general, this web app was developed by reverse-engineering Brown University's
 ## Seat signal
 
 The primary utility that is done being implemented and not seen elsewhere is Seat Signal, an application that allows you to track multiple classes and receive a direct call when a seat opens up. This solves a common problem on campus, and does so greater than its competitor (Coursicle) by
-a. Allowing tracking of 5 instead of only 1 class for free (or very cheap, if you run the webapp yourself)
-b. Sending a call with an informative voice message, instead of a mere notification which is easy to miss
 
-Seat signal works by letting users add courses through their account, and running an asynchronous polling of the C@B API for seat count, and using [Twilio](https://www.twilio.com/docs) to send a call when a seat opens up for any user.
+- Allowing tracking of 5 instead of only 1 class for free (or very cheap, if you run the webapp yourself)
+- Sending a call with an informative voice message, instead of a mere notification which is easy to miss
+
+Seat signal works by letting users add courses through their account, running an asynchronous polling of the C@B API for seat count, and using [Twilio](https://www.twilio.com/docs) to send a call when a seat opens up for any user.
 
 ## Prereq Map
 
