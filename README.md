@@ -25,7 +25,7 @@ Seat signal works by letting users add courses through their account, and runnin
 
 A course prerequisite visualizer. Queries course descriptions and uses string parsing to infer course dependencies (the C@B API simply does not provide this directly). Then, visualizes these dependencies in a tree.
 
-This is not yet offerred in the web app, but the core backend software that GETs all course descriptions in a given semester from C@B and parses the course description strings for likely dependencies is complete.
+This is not yet offerred in the web app, but the core backend software that GETs all course descriptions in a given semester from C@B and parses the course description strings for likely dependencies is complete [here](https://github.com/Fariznt/CAB_Prerequisites).
 
 ---
 
