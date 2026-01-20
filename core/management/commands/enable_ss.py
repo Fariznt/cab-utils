@@ -33,8 +33,13 @@ class Command(BaseCommand):
                         'key': 'crn:' + str(session.crn)
                     }
                     url = "https://cab.brown.edu/api/?page=fose&route=details"
-                    headers = { # look like a browser to CAB's API
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    headers = {  # look like a browser to CAB's API
+                        "User-Agent": (
+                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                            "AppleWebKit/537.36 (KHTML, like Gecko) "
+                            "Chrome/120.0.0.0 "
+                            "Safari/537.36"
+                        ),
                     }
                     response = requests.post(url, json=payload, headers=headers)
                     course_details = response.json()

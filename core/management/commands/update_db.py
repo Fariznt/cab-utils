@@ -34,8 +34,13 @@ class Command(BaseCommand):
             ]
         }
         search_url = 'https://cab.brown.edu/api/?page=fose&route=search&is_ind_study=N&is_canc=N'
-        headers = { # look like a browser to CAB's API
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        headers = {  # look like a browser to CAB's API
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 "
+                "Safari/537.36"
+            ),
         }
         try:
             response = requests.post(search_url, json=search_payload, headers=headers)
