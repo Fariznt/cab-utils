@@ -1,5 +1,7 @@
 TBD. currently using readme to plan
 
+-semester label is wrong
+-need to get my twilio number verified bc its processed as scam call
 -do a basic frontend in js for seat_signal to get more experience w/ js basics. include array methods and async/await with fetch. 
 -navigation bar
 -backend polishing
@@ -8,6 +10,9 @@ unspecified time in future:
 -react/ts lectures
 -frontend polishing
 -unit testing
+
+
+
 
 
 for now, im deferring texting functionality (Due to cost on twilio), but want to keep the app extensible for texting as a signal method.

@@ -41,7 +41,7 @@ def ss_view(request):
 
 def watch_course(request):
     """
-    API endpoint that to POST a new course session-watching 'Seat Signal'.
+    API endpoint to POST a new course session-watching 'Seat Signal'.
     """
 
     if not request.user.is_authenticated:
