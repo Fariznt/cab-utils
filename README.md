@@ -38,6 +38,25 @@ This web app is functional, and has been deployed on a VPS previously for testin
     - This type of calling gets callers labeled as Scam Likely, and steps need to be taken to ensure call reputation and prevent mobile carrier blocking
 - Homepage text (mostly user-friendly version of REAMDE stuff)
 
+# I want to run my own. What do I do?
+1. You need .env in the root directory with Twilio credentials (after making an account and paying for some credits) and the cap on the number of Seat Signals (courses being watched for new seats) permitted:
+- ACCOUNT_SID
+- AUTH_TOKEN
+- FROM_NUMBER
+- SIGNAL_CAP
+
+2. Install dependencies in requirements.txt
+- `pip install -r requirements.txt`
+
+To run in dev:
+- `python manage.py runserver` to start the local web server
+- `python manage.py update_db --help` to learn how to create your local C@B database
+- `python manage.py enable_ss` to start running the asynchronous polling service for Seat Signal
+
+
+
+
+
 # Possible Improvements
 
 Improvements (not absolutely necessary, but imporant for scale):
