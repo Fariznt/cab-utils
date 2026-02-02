@@ -80,5 +80,3 @@ class Command(BaseCommand):
                 cursor.executemany(sql, rows)
 
         self.stdout.write("Database update complete.")   
-
-        # changing from looped ORM inset to batched SQL insert led to ~200x+ speedup   
