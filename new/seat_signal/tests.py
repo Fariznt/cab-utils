@@ -1,8 +1,11 @@
+from unittest.mock import patch
+
 from django.test import TestCase, override_settings
 
 from core.models import CourseSession, User
 from seat_signal import utils
-from seat_signal.services import SignalCapExceeded, create_watch
+from seat_signal.services import SignalCapExceeded, create_watch, find_signals_with_open_seats
+from seat_signal.signals import seat_opened
 
 
 class SemesterUtilsTests(TestCase):
@@ -44,3 +47,38 @@ class CreateWatchTests(TestCase):
         create_watch(self.user, self.sessions[1])
         with self.assertRaises(SignalCapExceeded):
             create_watch(self.user, self.sessions[2])
+
+
+class SeatOpenedSignalTests(TestCase):
+    """
+    Nothing else proves find_signals_with_open_seats actually surfaces a
+    watched session once seats open, or that seat_opened is receivable with
+    the kwargs a listener (sms's future receiver) would expect. C@B itself
+    is mocked out so this never makes a live network call.
+    """
+
+    def setUp(self):
+        self.user = User.objects.create_user(phone_num="+15559876543")
+        self.session = CourseSession.objects.create(
+            crn="99999", code="CSCI 0320", section="S01", sem_id="202410", title="Test"
+        )
+        create_watch(self.user, self.session)
+
+    @patch("seat_signal.services.check_seat_availability", return_value=1)
+    def test_open_seat_is_surfaced_and_signal_is_receivable(self, mock_check_seat_availability):
+        results = list(find_signals_with_open_seats())
+        self.assertEqual(results, [(self.session, [self.user])])
+
+        received = []
+
+        def on_seat_opened(sender, **kwargs):
+            received.append(kwargs)
+
+        seat_opened.connect(on_seat_opened)
+        try:
+            session, users = results[0]
+            seat_opened.send(sender=self.__class__, user=users[0], session=session)
+        finally:
+            seat_opened.disconnect(on_seat_opened)
+
+        self.assertEqual(received, [{"signal": seat_opened, "user": self.user, "session": self.session}])
