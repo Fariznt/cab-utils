@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seat Signal — text alerts when a course seat opens</title>
+<meta name="description" content="Text Seat Signal and it will text you back the moment a seat opens in the course section you're waiting on. Free, no account, no app.">
+<meta name="robots" content="noindex">
+<style>
+  :root {
+    --fg: #16191d; --muted: #5d646d; --bg: #fff; --panel: #f6f7f9;
+    --rule: #e3e6ea; --accent: #146b52; --you: #e8eaed;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fg: #e9ecef; --muted: #9aa2ac; --bg: #131619; --panel: #1b1f24;
+      --rule: #2b3138; --accent: #63c6a5; --you: #262b31;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0 auto; padding: 3.5rem 1.25rem 4rem; max-width: 44rem;
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--fg); background: var(--bg);
+  }
+  h1 { font-size: 2.25rem; line-height: 1.15; letter-spacing: -.025em; margin: 0 0 .5rem; }
+  h2 { font-size: 1.3rem; letter-spacing: -.015em; margin: 3rem 0 .75rem; }
+  h3 { font-size: 1rem; margin: 1.75rem 0 .35rem; }
+  p { margin: 0 0 1rem; }
+  .lede { font-size: 1.15rem; color: var(--muted); margin-bottom: 2rem; }
+
+  /* the number is the primary call to action, so it gets to be the loudest thing */
+  .cta { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px;
+         padding: 1.5rem; text-align: center; margin: 0 0 1rem; }
+  .cta .label { font-size: .8rem; text-transform: uppercase; letter-spacing: .09em;
+                color: var(--muted); margin-bottom: .4rem; }
+  .cta .num { font-size: 1.85rem; font-weight: 700; letter-spacing: -.02em;
+              color: var(--accent); text-decoration: none; display: block; }
+  .cta .sub { font-size: .9rem; color: var(--muted); margin-top: .5rem; }
+
+  /* sample conversation doubles as the clearest explanation of the flow */
+  .thread { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px;
+            padding: 1.1rem; margin: 1rem 0 1.5rem; }
+  .msg { max-width: 85%; padding: .55rem .85rem; border-radius: 14px; margin-bottom: .5rem;
+         font-size: .93rem; line-height: 1.5; white-space: pre-line; }
+  .msg.them { background: var(--accent); color: #fff; border-bottom-left-radius: 4px; }
+  .msg.you { background: var(--you); color: var(--fg); margin-left: auto;
+             border-bottom-right-radius: 4px; text-align: right; }
+  .gap { text-align: center; color: var(--muted); font-size: .82rem; margin: .9rem 0; }
+
+  table { border-collapse: collapse; width: 100%; margin: .5rem 0 1rem; font-size: .95rem; }
+  th, td { text-align: left; padding: .6rem .5rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-size: .78rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+  td:first-child { white-space: nowrap; font-weight: 600; }
+
+  code { background: rgba(128,128,128,.16); padding: .12rem .38rem; border-radius: 3px;
+         font-size: .88em; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  ul { padding-left: 1.25rem; }
+  li { margin-bottom: .45rem; }
+  a { color: var(--accent); }
+  .fine { font-size: .93rem; color: var(--muted); }
+  footer { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--rule);
+           font-size: .88rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<h1>Stop refreshing the course registration page.</h1>
+<p class="lede">
+  Seat Signal watches the course section you want and texts you the second a seat opens up.
+  No app, no account, no password. Just a text message.
+</p>
+
+<div class="cta">
+  <div class="label">Text to get started</div>
+  <a class="num" href="sms:+18024387328">(802) 438-7328</a>
+  <div class="sub">That spells 802-GET-SEAT. Free to use. Msg &amp; data rates may apply.</div>
+</div>
+
+<h2>How it works</h2>
+<p>
+  Text the number and it asks a couple of quick questions: which course you're waiting on, and
+  which section. Confirm your pick and you're set. It takes about a minute, and you don't need
+  to know any special commands or formats.
+</p>
+<p>
+  Then it goes quiet. When a seat opens in a section you're watching, you get a text telling you
+  which course and section it was, so you can go register.
+</p>
+
+<div class="thread">
+  <div class="msg you">hey</div>
+  <div class="msg them">Hi! I'm Seat Signal. Tell me a course you're waiting on and I'll text you when a seat opens up in it.
+
+Msg &amp; data rates may apply. Reply HELP for help, STOP to cancel everything.</div>
+  <div class="gap">— a few days later —</div>
+  <div class="msg them">A seat just opened in CSCI 0320 S01. Register now at cab.brown.edu.</div>
+</div>
+<p class="fine">
+  Example messages. The exact wording changes as the service gets better.
+</p>
+
+<p class="fine">
+  Alerts are one-shot. Once you've been texted about a section, that alert is finished, so you
+  won't keep getting pinged about a course you already grabbed. You can watch more than one
+  section at a time, and you can cancel any of them whenever you want.
+</p>
+
+<h2>Texting commands</h2>
+<p>Two words always work, from anywhere in the conversation, whatever else is going on.</p>
+
+<table>
+  <tr><th>Text this</th><th>What happens</th></tr>
+  <tr>
+    <td><code>HELP</code></td>
+    <td>Shows you what you can do (set up an alert, see the ones you already have, cancel one)
+        along with contact info, from wherever you are in the conversation.</td>
+  </tr>
+  <tr>
+    <td><code>STOP</code></td>
+    <td>Cancels every alert you have and stops all messages from Seat Signal. You'll get one
+        confirmation text and then nothing else, ever. You can always start again later by
+        texting the number.</td>
+  </tr>
+</table>
+
+<h2>Questions</h2>
+
+<h3>What does it cost?</h3>
+<p>
+  Nothing. Seat Signal is free. Your carrier's normal message and data rates apply, the same as
+  any other text you send.
+</p>
+
+<h3>Do I need to make an account?</h3>
+<p>
+  No. Your phone number is your account. There's no password to forget and no website to log
+  into. Texting the number is what signs you up, and it's the only thing that does.
+</p>
+
+<h3>Can someone else sign up my number as a prank?</h3>
+<p>
+  No. Alerts only ever go to the number that texted in. There's no form anywhere that lets one
+  person enter another person's number, and numbers are never imported, purchased, or added
+  from any other source. If you're getting messages, it's because that phone sent the first text.
+</p>
+
+<h3>How many texts will I get?</h3>
+<p>
+  It depends entirely on how many alerts you set up. Setting one up takes a handful of messages
+  back and forth, and then it's quiet until a seat actually opens, which is one more text. If
+  no seat opens, you hear nothing.
+</p>
+
+<h3>How do I make it stop?</h3>
+<p>
+  Reply <code>STOP</code> to any message and everything stops immediately. If you'd rather drop
+  just one alert and keep the rest, text the number and it'll walk you through it.
+</p>
+
+<h3>What do you do with my phone number?</h3>
+<p>
+  It's stored encrypted, and it's used for exactly two things: knowing who you are when you
+  text in, and sending you your alerts. It's shared only with the licensed messaging provider
+  that actually delivers the texts, because there's no way to send you a message otherwise.
+</p>
+<p>
+  It is never sold, rented, or given to anyone else. No mobile information is shared with third
+  parties or affiliates for marketing or promotional purposes. There is no marketing here at
+  all, and there never will be. Text <code>STOP</code> to stop messages, or email the address
+  below and your number and everything attached to it will be deleted.
+</p>
+
+<h3>What user information do you keep?</h3>
+<ul>
+  <li>Your phone number, encrypted.</li>
+  <li>Your messages with the service, so the conversation can pick up where it left off.</li>
+</ul>
+
+<h3>Is this official? Does Brown run it?</h3>
+<p>
+  No. Seat Signal is an independent tool built by a student. It reads the same public course
+  listings you can see yourself and checks them so you don't have to.
+</p>
+
+<h3>Can I rely on it to get into a class?</h3>
+<p>
+  Please don't rely on it as your only plan. Seat Signal is provided free and as-is, with no
+  guarantee that an alert will arrive, arrive on time, or be correct. Course data comes from
+  public listings and can be delayed or wrong. An alert tells you a seat appeared, it doesn't
+  hold one for you, and someone else may take it first. Always confirm in your school's
+  official registration system.
+</p>
+
+<footer>
+  <p>
+    Questions, problems, or want your data deleted?
+    Email <a href="mailto:contact@fariz.cc">contact@fariz.cc</a>.
+  </p>
+  <p>
+    Seat Signal is operated by Muhammad Fariz Imran. It is an independent, student-built
+    tool and is not affiliated with, endorsed by, operated by, or connected to Brown University
+    or any other college or university. Course data is read from publicly accessible course
+    listings.
+  </p>
+  <p>Last updated August 2026.</p>
+</footer>
+
+</body>
+</html>

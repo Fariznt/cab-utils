@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Loads .env if present. 
+# Loads .env if present.
 load_dotenv(BASE_DIR / ".env")
 
 REQUIRED_ENV_VARS = [
@@ -138,7 +138,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # Logging --- JSON lines to a rotating file, so update_db/poll_seats' logger.info
-# calls (and the poll loop's heartbeat) land somewhere durable.
+# calls (and the poll loop's heartbeat) land somewhere durable. Deliberately no
+# AWS coupling: a CloudWatch Agent can tail the file in prod if set up later.
 LOGS_DIR = BASE_DIR / "logs"
 LOGS_DIR.mkdir(exist_ok=True)
 
