@@ -1,4 +1,9 @@
+from django.urls import path
+
+from sms.views import TelnyxWebhookView
+
 app_name = "sms"
 
-# Telnyx webhook route lands here once sms is built out.
-urlpatterns = []
+urlpatterns = [
+    path("webhook/", TelnyxWebhookView.as_view(), name="telnyx-webhook"),
+]

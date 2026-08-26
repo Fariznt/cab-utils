@@ -1,5 +1,5 @@
 """
-Send a "Ping!" text via Telnyx to TELNYX_TEST_RECIPIENT, from TELNYX_PHONE_NUMBER.
+Send a text via Telnyx to TELNYX_TEST_RECIPIENT, from TELNYX_PHONE_NUMBER.
 Confirms outbound SMS sending works end to end.
 
 Usage:
@@ -19,7 +19,7 @@ def main():
 
     response = requests.post(
         TELNYX_MESSAGES_URL,
-        json={"from": from_number, "to": to_number, "text": "Ping!"},
+        json={"from": from_number, "to": to_number, "text": "Ping! This is a test message sent by a developer to a developer phone number."},
         headers={"Authorization": f"Bearer {api_key}"},
     )
     try:

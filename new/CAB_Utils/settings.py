@@ -30,6 +30,8 @@ REQUIRED_ENV_VARS = [
     "POSTGRES_PORT",
     "PHONE_ENCRYPTION_KEY",
     "SIGNAL_CAP",
+    "TELNYX_API_KEY",
+    "TELNYX_PHONE_NUMBER",
 ]
 missing_vars = [var for var in REQUIRED_ENV_VARS if os.environ.get(var) is None]
 if missing_vars:
@@ -47,6 +49,11 @@ if len(base64.b64decode(PHONE_ENCRYPTION_KEY)) != 64:
 # Max active SeatSignal watches per user (see seat_signal.services.create_watch) —
 # critical guardrail against SMS-cost/abuse, not just a UX nicety.
 SIGNAL_CAP = int(os.environ["SIGNAL_CAP"])
+
+# Telnyx - read by sms/telnyx_client.py (outbound) and sms/views.py (inbound
+# webhook). Same vars sms/scripts/ use for their standalone connectivity checks.
+TELNYX_API_KEY = os.environ["TELNYX_API_KEY"]
+TELNYX_PHONE_NUMBER = os.environ["TELNYX_PHONE_NUMBER"]
 
 
 # Application definition
