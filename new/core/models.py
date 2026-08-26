@@ -71,7 +71,7 @@ class EventLog(models.Model):
     session = models.ForeignKey(
         CourseSession, null=True, blank=True, on_delete=models.SET_NULL
     )
-    message = models.TextField(blank=True)
+    message = models.TextField(null=True, blank=True)
     metadata = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
