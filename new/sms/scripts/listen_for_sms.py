@@ -16,6 +16,8 @@ import json
 import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
+from sms.scripts._bootstrap import require_env
+
 # Python fully buffers stdout when it's not a terminal (nohup, a log redirect,
 # run_in_background) - without this, prints below sit unseen until the buffer
 # fills or the process exits.
@@ -52,8 +54,10 @@ def main():
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
 
+    webhook_url = require_env("TELNYX_INBOUND_WEBHOOK_URL")
     server = HTTPServer(("0.0.0.0", args.port), TelnyxWebhookHandler)
     print(f"Listening on :{args.port} for Telnyx webhooks (Ctrl+C to stop)")
+    print(f"Point Telnyx's inbound webhook at: {webhook_url}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

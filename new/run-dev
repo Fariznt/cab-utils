@@ -1,0 +1,18 @@
+#!/bin/bash
+# Starts everything needed for local dev: db, migrations, poll loop, server.
+# Safe to re-run — docker compose and migrate are both idempotent.
+set -e
+
+cd "$(dirname "$0")"
+source venv/bin/activate
+
+docker compose up -d db
+python manage.py migrate
+
+# poll_seats runs in the background; kill it when this script exits so
+# Ctrl+C doesn't leave an orphaned process behind.
+python manage.py poll_seats &
+POLL_PID=$!
+trap "kill $POLL_PID 2>/dev/null" EXIT
+
+python manage.py runserver
