@@ -2,7 +2,7 @@
 Stand up a plain HTTP listener to receive Telnyx's inbound SMS webhook and
 print what arrives (sender, text, event type). This is a connectivity check
 only, not the real webhook - the real inbound handler (conversation logic,
-signature verification) lives in sms/views.py once that's built.
+signature verification) lives in sms/views/ once that's built.
 
 Point the Cloudflare tunnel (localhost:8000 by default) and Telnyx's Messaging
 Profile inbound webhook URL at whatever public URL routes here, then text the

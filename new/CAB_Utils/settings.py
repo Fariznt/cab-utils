@@ -51,11 +51,11 @@ if len(base64.b64decode(PHONE_ENCRYPTION_KEY)) != 64:
 # critical guardrail against SMS-cost/abuse, not just a UX nicety.
 SIGNAL_CAP = int(os.environ["SIGNAL_CAP"])
 
-# Telnyx - read by sms/telnyx_client.py (outbound) and sms/views.py (inbound
+# Telnyx - read by sms/views/telnyx_client.py (outbound) and sms/views/auth.py (inbound
 # webhook). Same vars sms/scripts/ use for their standalone connectivity checks.
 TELNYX_API_KEY = os.environ["TELNYX_API_KEY"]
 # Ed25519 public key from the Telnyx portal, used to verify inbound webhook
-# signatures (see sms.views.TelnyxSignature).
+# signatures (see sms.views.auth.TelnyxSignature).
 TELNYX_PUBLIC_KEY = os.environ["TELNYX_PUBLIC_KEY"]
 TELNYX_PHONE_NUMBER = os.environ["TELNYX_PHONE_NUMBER"]
 
