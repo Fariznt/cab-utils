@@ -16,7 +16,10 @@ import json
 import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-from sms.scripts._bootstrap import require_env
+# Path must match sms/urls.py + CAB_Utils/urls.py; host is the Cloudflare
+# tunnel's hostname, configured as this Messaging Profile's inbound webhook
+# URL in the Telnyx portal.
+TELNYX_INBOUND_WEBHOOK_URL = "https://api.seatsignal.fariz.cc/sms/webhook/"
 
 # Python fully buffers stdout when it's not a terminal (nohup, a log redirect,
 # run_in_background) - without this, prints below sit unseen until the buffer
@@ -54,10 +57,9 @@ def main():
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
 
-    webhook_url = require_env("TELNYX_INBOUND_WEBHOOK_URL")
     server = HTTPServer(("0.0.0.0", args.port), TelnyxWebhookHandler)
     print(f"Listening on :{args.port} for Telnyx webhooks (Ctrl+C to stop)")
-    print(f"Point Telnyx's inbound webhook at: {webhook_url}")
+    print(f"Point Telnyx's inbound webhook at: {TELNYX_INBOUND_WEBHOOK_URL}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

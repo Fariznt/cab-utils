@@ -1,0 +1,1 @@
+This directory is just for landing page files. I needed a website for the registering the texting campaign and maybe describing the service in marketing

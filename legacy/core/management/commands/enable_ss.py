@@ -74,8 +74,8 @@ class Command(BaseCommand):
             except Exception as e:
                 logger.error(f"Error in SeatSignal task: {e}")
             finally:
-                logger.info("End of check. Scheduling next SeatSignal check in 10 seconds...")
-                time.sleep(10)
+                logger.info("End of check. Scheduling next SeatSignal check in 30 seconds...")
+                time.sleep(30)
 
     def send_signal(self, crn, to_number) -> None:
         """Notifies the user (by call) of an open seat in the session they had SeatSignal watching"""
