@@ -4,7 +4,7 @@ from django.contrib.auth.base_user import BaseUserManager
 class UserManager(BaseUserManager):
     """
     Users are identified by phone number, not username. Regular signups (via
-    SMS) never set a password — `create_user` leaves it unusable in that case.
+    SMS) never set a password: `create_user` leaves it unusable in that case.
     Staff accounts get a real one so they can log into /admin.
     """
 

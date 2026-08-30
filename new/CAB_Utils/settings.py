@@ -2,9 +2,9 @@
 Django settings for CAB_Utils project.
 
 Environment-conditioned: every setting below is read from a plain env var via
-os.environ, the same way locally and in prod. Only *how those env vars get
-populated* differs per environment — locally via .env + python-dotenv (below),
-in prod via a deploy-time fetch from AWS SSM (see migration_project_overview.md).
+os.environ, the same way locally and in prod. Only how those env vars get
+populated differs per environment: locally via .env + python-dotenv (below),
+in prod via a deploy-time fetch from AWS SSM.
 This file has no AWS awareness and no dev/prod branching of its own.
 """
 
@@ -42,13 +42,13 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 DEBUG = os.environ["DEBUG"].lower() in ("1", "true", "yes")
 ALLOWED_HOSTS = [h.strip() for h in os.environ["ALLOWED_HOSTS"].split(",") if h.strip()]
 
-# AES-256-SIV key for core.fields.EncryptedPhoneField — base64-encoded 64 bytes.
+# AES-256-SIV key for core.fields.EncryptedPhoneField, base64-encoded 64 bytes.
 PHONE_ENCRYPTION_KEY = os.environ["PHONE_ENCRYPTION_KEY"]
 if len(base64.b64decode(PHONE_ENCRYPTION_KEY)) != 64:
     raise ValueError("PHONE_ENCRYPTION_KEY must decode to exactly 64 bytes (AES-256-SIV)")
 
-# Max active SeatSignal watches per user (see seat_signal.services.create_watch) —
-# critical guardrail against SMS-cost/abuse, not just a UX nicety.
+# Max active SeatSignal watches per user (see seat_signal.services.create_watch),
+# a guardrail against SMS-cost/abuse, not just a UX nicety.
 SIGNAL_CAP = int(os.environ["SIGNAL_CAP"])
 
 # Telnyx - read by sms/views/telnyx_client.py (outbound) and sms/views/auth.py (inbound

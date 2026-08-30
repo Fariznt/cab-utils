@@ -6,7 +6,7 @@ from core.models import CourseSession, EventLog, User
 
 @admin.register(User)
 class UserAdmin(DjangoUserAdmin):
-    # No username/first/last name/email fields on this model — phone_num
+    # No username/first/last name/email fields on this model, phone_num
     # is the only identity field, so the default UserAdmin fieldsets don't apply.
     ordering = ["id"]
     list_display = ["id", "is_staff", "is_active", "date_joined"]

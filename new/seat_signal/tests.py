@@ -17,8 +17,8 @@ from seat_signal.signals import seat_opened
 class SemesterUtilsTests(TestCase):
     """
     Winter/Spring belong to the *next* calendar year relative to the academic
-    year encoded in a semester id — legacy's tasks.md flagged this exact shift
-    as a recurring off-by-one source, so it's pinned down here.
+    year encoded in a semester id. Easy off-by-one source, so it's pinned
+    down here.
     """
 
     def test_sem_id_to_str_round_trip(self):

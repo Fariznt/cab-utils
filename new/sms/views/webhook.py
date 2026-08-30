@@ -43,7 +43,6 @@ class TelnyxWebhook(APIView):
     Handles Telnyx (CPaaS providers) webhooks for inbound and outbound messages. 
     """
 
-
     # The caller is Telnyx, not a Django user, so no authentication backend
     # applies - the signature check is the whole of this endpoint's auth.
     authentication_classes = []

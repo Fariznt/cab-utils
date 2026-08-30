@@ -8,7 +8,7 @@ from core.managers import UserManager
 
 class User(AbstractBaseUser, PermissionsMixin):
     """
-    Phone number is the sole identity — no username. Regular users never get a
+    Phone number is the sole identity, no username. Regular users never get a
     usable password (see UserManager); staff/ops accounts do, for /admin login.
     """
     phone_num = EncryptedPhoneField(unique=True)

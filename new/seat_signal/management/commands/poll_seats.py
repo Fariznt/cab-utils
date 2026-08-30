@@ -21,9 +21,7 @@ class Command(BaseCommand):
         while True:
             checked = 0
             # find_signals_with_open_seats isolates one bad course's failure from
-            # the rest of the pass (see seat_signal/services.py) — legacy wrapped
-            # the *entire* pass in one try/except, so one bad course aborted
-            # checking everything after it.
+            # the rest of the pass (see seat_signal/services.py).
             for session, users in find_signals_with_open_seats():
                 checked += 1
                 logger.info(f"Open seat found for {session}, notifying {len(users)} user(s)")
@@ -31,12 +29,11 @@ class Command(BaseCommand):
                 SeatSignal.objects.filter(session=session).delete()
                 for user in users:
                     seat_opened.send(sender=self.__class__, user=user, session=session)
-                    # Randomized delay between notifications — throttling, same as legacy.
+                    # Randomized delay between notifications / throttling
                     time.sleep(random.uniform(1, 3))
                 time.sleep(random.uniform(2, 4))
 
-            # Heartbeat: distinguishes "running normally" from "died silently",
-            # which legacy had no way to tell apart.
+            # Heartbeat: distinguishes "running normally" from "died silently".
             now = timezone.now()
             logger.info(f"Poll cycle complete as of {now.isoformat()}")
             EventLog.objects.create(event_type="poll_cycle", message=f"Poll cycle complete, {checked} open seat(s) found")
