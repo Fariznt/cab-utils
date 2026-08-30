@@ -1,11 +1,11 @@
 """
-Semester-id conversions. Ported verbatim from legacy/seat_signal/utils.py — this
-is reverse-engineered domain knowledge about C@B, not implementation choice.
+Semester-id conversions. Reverse-engineered domain knowledge about C@B, not
+implementation choice.
 
 Semester id = 4-digit academic-year start year + 2-digit term code
 ('15'=Winter, '20'=Spring, '00'=Summer, '10'=Fall). Winter/Spring belong to the
 *second* calendar year of the academic year (e.g. '202415' = Winter, calendar
-year 2025) — a recurring source of off-by-one bugs, so this logic is pinned
+year 2025), a recurring source of off-by-one bugs, so this logic is pinned
 down by tests in seat_signal/tests.py.
 """
 

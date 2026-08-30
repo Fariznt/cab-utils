@@ -6,9 +6,9 @@ from core.models import User
 
 class EncryptedPhoneFieldTests(TestCase):
     """
-    Pins down the entire reason AES-SIV was chosen over Fernet: same plaintext
-    must always produce the same ciphertext, so a DB-level unique/exact lookup
-    on phone_num works — see migration_project_overview.md's key-changes table.
+    Pins down the reason AES-SIV was chosen over Fernet: same plaintext must
+    always produce the same ciphertext, so a DB-level unique/exact lookup on
+    phone_num works.
     """
 
     def test_round_trip_through_db(self):

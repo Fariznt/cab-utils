@@ -8,8 +8,7 @@ from seat_signal.models import SeatSignal
 
 logger = logging.getLogger(__name__)
 
-# Same reverse-engineered C@B endpoint/UA as legacy's enable_ss.py — required
-# for C@B's API to respond normally, see legacy_overview.md.
+# Reverse-engineered C@B details endpoint; needs a browser User-Agent to respond normally.
 DETAILS_URL = "https://cab.brown.edu/api/?page=fose&route=details"
 SPOOFED_HEADERS = {
     "User-Agent": (
@@ -27,9 +26,8 @@ class SignalCapExceeded(Exception):
 
 def create_watch(user: User, session: CourseSession) -> SeatSignal:
     """
-    Creates a SeatSignal watch. Enforces SIGNAL_CAP server-side — critical
-    since each watch is a future SMS send, not just a UX limit (same invariant
-    legacy's watch_course view enforced, now living in domain logic instead).
+    Creates a SeatSignal watch. Enforces SIGNAL_CAP server-side since each
+    watch is a future SMS send, not just a UX limit.
     """
     active_count = SeatSignal.objects.filter(user=user).count()
     if active_count >= settings.SIGNAL_CAP:
@@ -62,8 +60,8 @@ def get_watches_for_user(user: User):
 def check_seat_availability(session: CourseSession) -> int:
     """
     Hits C@B's details endpoint and returns the open seat count. C@B has no
-    plain numeric seats field — the count is embedded in an HTML fragment, so
-    it's scraped by string-partition (ported from legacy's enable_ss.py).
+    plain numeric seats field, the count is embedded in an HTML fragment, so
+    it's scraped by string-partition.
     """
     payload = {"key": f"crn:{session.crn}"}
     response = requests.post(DETAILS_URL, json=payload, headers=SPOOFED_HEADERS)
@@ -82,9 +80,8 @@ def find_signals_with_open_seats():
     """
     Checks every CourseSession with an active watch and yields (session, users)
     for the ones that currently have an open seat. Isolates one bad course's
-    failure (bad response, C@B format change, etc.) from the rest of the pass —
-    legacy wrapped the *entire* poll pass in one try/except, so a single bad
-    course aborted checking everything after it.
+    failure (bad response, C@B format change, etc.) from the rest of the pass,
+    so a single bad course doesn't abort checking everything after it.
     """
     for session in get_sessions_with_active_signals():
         try:

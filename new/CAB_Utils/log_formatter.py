@@ -3,7 +3,7 @@ import logging
 
 
 class JsonFormatter(logging.Formatter):
-    """Minimal JSON line formatter — no new dependency, just stdlib logging + json."""
+    """Minimal JSON line formatter, no new dependency beyond stdlib logging + json."""
 
     def format(self, record):
         payload = {

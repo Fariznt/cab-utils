@@ -12,8 +12,7 @@ class EncryptedPhoneField(models.CharField):
     AES-SIV is deterministic: encrypting the same plaintext twice always
     produces the same ciphertext. That's what lets `User.objects.get(phone_num=...)`
     and a DB-level `unique=True` keep working without decrypting every row to
-    find a match, at the cost of equal numbers being visible as equal in the DB
-    (acceptable here — see migration_project_overview.md's key-changes table).
+    find a match, at the cost of equal numbers being visible as equal in the DB.
     """
 
     def __init__(self, *args, **kwargs):

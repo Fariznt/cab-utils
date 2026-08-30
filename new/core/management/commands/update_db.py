@@ -8,7 +8,7 @@ from core.models import CourseSession
 
 logger = logging.getLogger(__name__)
 
-# Same reverse-engineered C@B endpoint/UA as legacy's update_db.py.
+# Reverse-engineered C@B search endpoint; needs a browser User-Agent to respond normally.
 SEARCH_URL = "https://cab.brown.edu/api/?page=fose&route=search&is_ind_study=N&is_canc=N"
 SPOOFED_HEADERS = {
     "User-Agent": (
@@ -30,7 +30,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             "search_id", type=int,
-            help="Semester identifier (see legacy_overview.md for the id format), or 99999 for current semesters.",
+            help="Semester identifier (see seat_signal/utils.py for the id format), or 99999 for current semesters.",
         )
 
     def handle(self, *args, **options):
@@ -58,9 +58,9 @@ class Command(BaseCommand):
             for cd in course_data["results"]
         ]
 
-        # Batched insert in one transaction — a 200x speedup over per-row ORM
-        # get_or_create() (see git history), preserved from legacy as-is.
-        # ON CONFLICT DO NOTHING against (crn, sem_id): CourseSession's PK is now
+        # Batched insert in one transaction, roughly 200x faster than per-row
+        # ORM get_or_create().
+        # ON CONFLICT DO NOTHING against (crn, sem_id): CourseSession's PK is
         # a surrogate id (crn alone isn't unique across semesters), so re-running
         # this for a semester already synced just skips already-known rows.
         table = CourseSession._meta.db_table
