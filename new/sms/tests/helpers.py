@@ -18,7 +18,7 @@ from django.urls import reverse
 
 from core.models import CourseSession, User
 from sms.models import ConversationState
-from sms.views import _get_current_sem_id
+from seat_signal.utils import get_current_sem_id
 
 # A throwaway keypair stands in for Telnyx's, so tests sign their own payloads
 # and the real signature check runs on every request instead of being mocked out.
@@ -30,7 +30,7 @@ SERVICE_NUMBER = "+15559998888"
 
 # Fixture courses are created in whatever semester the flow currently scopes to,
 # so the suite doesn't need updating every time REGISTRATION_PERIODS does.
-CURRENT_SEM_ID = _get_current_sem_id()
+CURRENT_SEM_ID = get_current_sem_id()
 FIXTURE_COURSES = [
     ("CSCI 0320", "Introduction to Software Engineering"),
     ("CSCI 0330", "Introduction to Computer Systems"),
@@ -52,13 +52,19 @@ def sign(body: bytes, timestamp: str | None = None, key=_PRIVATE_KEY) -> dict:
 class SmsTestCase(TestCase):
     def setUp(self):
         # Telnyx is never actually called; every send is captured here instead.
-        send_patcher = patch("sms.views.send_sms")
+        # send_sms is called from two modules - flow for conversation replies,
+        # webhook for the message.finalized retry - so both names point at one
+        # mock, keeping every send in a single ordered list.
+        send_patcher = patch("sms.views.flow.send_sms")
         self.send_sms = send_patcher.start()
         self.addCleanup(send_patcher.stop)
+        retry_patcher = patch("sms.views.webhook.send_sms", self.send_sms)
+        retry_patcher.start()
+        self.addCleanup(retry_patcher.stop)
 
         # The deliberate pauses (between the two help messages, before a retry)
         # are real-world pacing with no place in a test run.
-        sleep_patcher = patch("sms.views.time.sleep")
+        sleep_patcher = patch("sms.views.webhook.time.sleep")
         sleep_patcher.start()
         self.addCleanup(sleep_patcher.stop)
 
