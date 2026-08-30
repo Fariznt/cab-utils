@@ -9,10 +9,12 @@ class ConversationState(models.Model):
     AWAITING_COURSE = "awaiting_course"
     AWAITING_SECTION = "awaiting_section"
     AWAITING_CONFIRMATION = "awaiting_confirmation"
+    AWAITING_REMOVAL = "awaiting_removal"
     STATE_CHOICES = [
         (AWAITING_COURSE, "Awaiting course"),
         (AWAITING_SECTION, "Awaiting section"),
         (AWAITING_CONFIRMATION, "Awaiting confirmation"),
+        (AWAITING_REMOVAL, "Awaiting removal"),
     ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="conversation_state")

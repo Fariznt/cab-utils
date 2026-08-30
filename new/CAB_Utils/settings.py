@@ -31,6 +31,7 @@ REQUIRED_ENV_VARS = [
     "PHONE_ENCRYPTION_KEY",
     "SIGNAL_CAP",
     "TELNYX_API_KEY",
+    "TELNYX_PUBLIC_KEY",
     "TELNYX_PHONE_NUMBER",
 ]
 missing_vars = [var for var in REQUIRED_ENV_VARS if os.environ.get(var) is None]
@@ -53,6 +54,9 @@ SIGNAL_CAP = int(os.environ["SIGNAL_CAP"])
 # Telnyx - read by sms/telnyx_client.py (outbound) and sms/views.py (inbound
 # webhook). Same vars sms/scripts/ use for their standalone connectivity checks.
 TELNYX_API_KEY = os.environ["TELNYX_API_KEY"]
+# Ed25519 public key from the Telnyx portal, used to verify inbound webhook
+# signatures (see sms.views.TelnyxSignature).
+TELNYX_PUBLIC_KEY = os.environ["TELNYX_PUBLIC_KEY"]
 TELNYX_PHONE_NUMBER = os.environ["TELNYX_PHONE_NUMBER"]
 
 
