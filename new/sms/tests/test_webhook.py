@@ -233,17 +233,21 @@ class StateMessageErrorHandlingTests(SmsTestCase):
         self.assertIn("CSCI 0320", error.message)
 
     def test_failed_write_inside_the_handler_does_not_block_the_recovery_writes(self):
-        # pending_code's max_length is 9 - this reproduces a real mid-handler DB
-        # failure (not a mocked one) to prove the savepoint actually isolates it
+        # The handler writes the matched course, then texts the section prompt.
+        # Failing that send after the write is the case the savepoint exists for:
+        # the write has to roll back while the recovery writes below still land.
         self.onboard()
+        self.send_sms.side_effect = [RuntimeError("telnyx down"), None]
 
-        response = self.text("a course name much longer than nine characters")
+        response = self.text("CSCI 0320")
 
         self.assertEqual(response.status_code, 200)
-        self.assert_sent(GENERIC_ERROR_MESSAGE)
+        self.assertEqual(self.last_sent(), GENERIC_ERROR_MESSAGE)
         self.assertTrue(EventLog.objects.filter(event_type="error").exists())
         # the failed write must not have landed
-        self.assertEqual(self.conversation_state().pending_code, "")
+        conversation_state = self.conversation_state()
+        self.assertEqual(conversation_state.pending_code, "")
+        self.assertEqual(conversation_state.state, ConversationState.AWAITING_COURSE)
 
     def test_error_in_any_state_is_recovered_the_same_way(self):
         targets = {

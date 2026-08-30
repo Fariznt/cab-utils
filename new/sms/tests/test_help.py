@@ -6,9 +6,10 @@ _handle_state_message, one beat later, only for an opted-in known user.
 """
 
 from sms.models import ConversationState
-from sms.tests.helpers import SmsTestCase
+from seat_signal.utils import get_sem_str
+from sms.tests.helpers import CURRENT_SEM_ID, SmsTestCase
 from sms.views import (
-    HELP_CONFIRMATION_MESSAGE,
+    HELP_CONFIRMATION_TEMPLATE,
     HELP_COURSE_MESSAGE,
     HELP_MESSAGE,
     HELP_REMOVAL_MESSAGE,
@@ -16,10 +17,16 @@ from sms.views import (
     OPT_IN_MESSAGE,
 )
 
+# The confirmation step's help names the selection it is asking about, so it
+# depends on what the test put in the conversation state below.
+CONFIRMATION_HELP = HELP_CONFIRMATION_TEMPLATE.format(
+    selection=f"CSCI 0320 S01 ({get_sem_str(CURRENT_SEM_ID)})"
+)
+
 STATE_HELP_MESSAGES = {
     ConversationState.AWAITING_COURSE: HELP_COURSE_MESSAGE,
     ConversationState.AWAITING_SECTION: HELP_SECTION_MESSAGE,
-    ConversationState.AWAITING_CONFIRMATION: HELP_CONFIRMATION_MESSAGE,
+    ConversationState.AWAITING_CONFIRMATION: CONFIRMATION_HELP,
     ConversationState.AWAITING_REMOVAL: HELP_REMOVAL_MESSAGE,
 }
 
@@ -29,7 +36,7 @@ class HelpTests(SmsTestCase):
         self.onboard()
         for state, tailored_message in STATE_HELP_MESSAGES.items():
             with self.subTest(state=state):
-                self.set_state(state, code="CSCI 0320")
+                self.set_state(state, code="CSCI 0320", section="S01")
                 self.send_sms.reset_mock()
 
                 self.text("HELP")

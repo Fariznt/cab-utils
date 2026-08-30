@@ -8,6 +8,7 @@ flow.py's job. Keeping the copy in one file means reworking wording never means
 opening the webhook or the flow logic.
 """
 
+from core.models import CourseSession
 from seat_signal.utils import get_current_sem_id, get_sem_str
 
 START_KEYWORD = "START"
@@ -43,8 +44,8 @@ HELP_SECTION_MESSAGE = (
     "Reply with the section code for that course, like 'S01'. Reply EXIT to leave the "
     "course picking flow."
 )
-HELP_CONFIRMATION_MESSAGE = (
-    "Reply YES to confirm that seat signal, or EXIT to leave the course picking flow."
+HELP_CONFIRMATION_TEMPLATE = (
+    "Reply YES to set a seat signal for {selection}, or EXIT to leave the course picking flow."
 )
 HELP_REMOVAL_MESSAGE = (
     "Reply with the number of the seat signal you want to remove, or EXIT to leave "
@@ -78,16 +79,29 @@ def _course_prompt():
         f"Which {get_sem_str(get_current_sem_id())} course would you like to watch for seats? "
         "Reply VIEW to see your active seat signals, or REMOVE to delete one."
     )
-SECTION_PROMPT = "Which section of that course? Reply with a section code like 'S01'."
-CONFIRM_PROMPT = "Is the following course and section selection correct?"
+def _section_prompt(conversation_state):
+    return (
+        f"Which section of {_pending_course_label(conversation_state)}? "
+        "Reply with a section code like 'S01'."
+    )
+
+
+def _confirm_prompt(conversation_state):
+    return f"Is this correct? {_pending_session_label(conversation_state)}"
+
+
+def _help_confirmation_message(conversation_state):
+    return HELP_CONFIRMATION_TEMPLATE.format(
+        selection=_pending_session_label(conversation_state)
+    )
 
 
 def _course_not_found_message():
     return f"Could not find that course in {get_sem_str(get_current_sem_id())}."
 
 
-def _section_not_found_message():
-    return f"Could not find that section in {get_sem_str(get_current_sem_id())}."
+def _section_not_found_message(conversation_state):
+    return f"Could not find that section for {_pending_course_label(conversation_state)}."
 
 SIGNAL_SET_MESSAGE = (
   "Seat signal for {session} has been set. To view course sessions being watched, reply VIEW."
@@ -100,6 +114,26 @@ GENERIC_ERROR_MESSAGE = (
     "Something went wrong. Please report this error through the contact info at "
     "https://bit.ly/4ik1eEZ."
 )
+
+
+def _pending_course_label(conversation_state):
+    """The course being picked, named the way a student would recognise it."""
+    title = (
+        CourseSession.objects.filter(
+            code=conversation_state.pending_code, sem_id=conversation_state.pending_sem_id
+        )
+        .values_list("title", flat=True)
+        .first()
+    )
+    return f"{conversation_state.pending_code} ({title})" if title else conversation_state.pending_code
+
+
+def _pending_session_label(conversation_state):
+    """The full course + section selection, before it becomes a SeatSignal."""
+    return (
+        f"{conversation_state.pending_code} {conversation_state.pending_section} "
+        f"({get_sem_str(conversation_state.pending_sem_id)})"
+    )
 
 
 def _session_label(session):
