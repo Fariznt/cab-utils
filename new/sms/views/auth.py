@@ -21,9 +21,7 @@ SIGNATURE_TOLERANCE_SECONDS = 300
 class TelnyxSignature(BasePermission):
     """
     Verifies Telnyx's Ed25519 webhook signature. The caller is Telnyx, not a
-    Django user, so this is the only authentication this endpoint has - without
-    it, anyone who found the URL could POST a message.received claiming to be
-    any phone number and drive that user's conversation.
+    Django user, so this is the only authentication the webhook endpoint has
     """
 
     message = "Invalid Telnyx signature."
