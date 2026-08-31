@@ -135,7 +135,11 @@ class NewUserOnboardingTests(SmsTestCase):
 class RecordKeepingTests(SmsTestCase):
     """
     Everything ops can see downstream comes from these two records, so they're
-    asserted on their own rather than as a side note of the flow tests.
+    asserted on their own rather than as a side note of the flow tests. Only
+    the inbound half is checked here - send_sms is mocked wholesale in every
+    test in this suite (see SmsTestCase), so the outbound sms_sent/transcript
+    writes it makes are unobservable at this level. Those are covered directly
+    in test_telnyx_client.py, against the real send_sms.
     """
 
     def test_account_creation_is_logged(self):
@@ -145,29 +149,21 @@ class RecordKeepingTests(SmsTestCase):
             EventLog.objects.filter(event_type="account_created", user=self.user()).exists()
         )
 
-    def test_inbound_and_outbound_are_both_logged(self):
+    def test_inbound_message_is_logged(self):
         self.text("hello")
 
         self.assertEqual(
             EventLog.objects.filter(event_type="sms_received").values_list("message", flat=True)[0],
             "hello",
         )
-        self.assertEqual(
-            EventLog.objects.filter(event_type="sms_sent").values_list("message", flat=True)[0],
-            OPT_IN_MESSAGE,
-        )
 
-    def test_transcript_records_both_directions_in_order(self):
+    def test_transcript_records_the_inbound_message(self):
         self.text("hello")
 
         messages = MessageHistory.objects.get(user=self.user()).messages
-        self.assertEqual(
-            [(m["direction"], m["body"]) for m in messages],
-            [("inbound", "hello"), ("outbound", OPT_IN_MESSAGE)],
-        )
-        # inbound carries Telnyx's timestamp, outbound one we stamped ourselves
+        self.assertEqual([(m["direction"], m["body"]) for m in messages], [("inbound", "hello")])
+        # inbound carries Telnyx's timestamp, stamped by us for outbound (see test_telnyx_client.py)
         self.assertEqual(messages[0]["at"], "2026-08-28T12:00:00.000Z")
-        self.assertIsNotNone(messages[1]["at"])
 
 
 class FinalizedEventTests(SmsTestCase):
@@ -191,7 +187,7 @@ class FinalizedEventTests(SmsTestCase):
         self.assertEqual(error.metadata["message_id"], "msg-outbound")
 
         self.send_sms.assert_called_once_with(
-            USER_NUMBER, "a sent message", tags=[RETRY_TAG]
+            None, USER_NUMBER, "a sent message", tags=[RETRY_TAG]
         )
 
     def test_permanent_failure_is_not_retried(self):
@@ -224,7 +220,7 @@ class StateMessageErrorHandlingTests(SmsTestCase):
     def test_unhandled_exception_gets_a_generic_reply_and_is_logged(self):
         self.onboard()
 
-        with patch("sms.views.flow._register_course", side_effect=RuntimeError("boom")):
+        with patch("sms.views.inbound_state_handler._register_course", side_effect=RuntimeError("boom")):
             response = self.text("CSCI 0320")
 
         self.assertEqual(response.status_code, 200)
@@ -251,8 +247,8 @@ class StateMessageErrorHandlingTests(SmsTestCase):
 
     def test_error_in_any_state_is_recovered_the_same_way(self):
         targets = {
-            ConversationState.AWAITING_COURSE: "sms.views.flow._register_course",
-            ConversationState.AWAITING_SECTION: "sms.views.flow._register_section",
+            ConversationState.AWAITING_COURSE: "sms.views.inbound_state_handler._register_course",
+            ConversationState.AWAITING_SECTION: "sms.views.inbound_state_handler._register_section",
         }
         self.onboard()
         for state, target in targets.items():

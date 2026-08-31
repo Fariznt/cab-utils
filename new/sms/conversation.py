@@ -4,8 +4,8 @@ functions that build the ones depending on runtime state (the current semester,
 a user's watch list).
 
 Nothing here writes to the database or decides what happens next - that is
-flow.py's job. Keeping the copy in one file means reworking wording never means
-opening the webhook or the flow logic.
+inbound_state_handler.py's job. Keeping the copy in one file means reworking
+wording never means opening the webhook or the flow logic.
 """
 
 from core.models import CourseSession
@@ -113,6 +113,14 @@ CAP_REACHED_MESSAGE = (
 GENERIC_ERROR_MESSAGE = (
     "Something went wrong. Please report this error through the contact info at "
     "https://bit.ly/4ik1eEZ."
+)
+
+# Sent by sms/signals.py's seat_opened receiver - the poll loop already deleted
+# the SeatSignal by the time this goes out, so this is a one-shot alert, not a
+# recurring one.
+SEAT_OPENED_MESSAGE = (
+    "A seat opened up for {session}! This seat signal has been used. Reply with "
+    "a course name to set a new one."
 )
 
 

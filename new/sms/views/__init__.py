@@ -1,9 +1,10 @@
 """
-The sms app's view layer and the pieces the conversation is built from.
+The sms app's view layer: the Telnyx-facing pieces of the conversation.
 
-Split by job: conversation.py holds what we say, flow.py what we do with a
-reply, webhook.py the Telnyx endpoint, auth.py its signature check, and
-telnyx_client.py the outbound call.
+Split by job: webhook.py the Telnyx endpoint, inbound_state_handler.py what we
+do with a reply, and auth.py its signature check. (conversation.py, what we
+say, and telnyx_client.py, the outbound call, live at the app root — neither
+is a view.)
 
 Re-exported here so callers (urls.py, tests) have one import path for the
 app's public surface. Note that `mock.patch` must still target the defining
@@ -11,8 +12,7 @@ module - patching a name here rebinds only this namespace, not the module the
 calling code resolves it from.
 """
 
-from sms.views.auth import SIGNATURE_TOLERANCE_SECONDS, TelnyxSignature
-from sms.views.conversation import (
+from sms.conversation import (
     CAP_REACHED_MESSAGE,
     CONFIRM_RETRY_MESSAGE,
     EXIT_KEYWORDS,
@@ -31,6 +31,7 @@ from sms.views.conversation import (
     REMOVAL_RETRY_MESSAGE,
     REMOVE_KEYWORD,
     REMOVE_PROMPT,
+    SEAT_OPENED_MESSAGE,
     SIGNAL_SET_MESSAGE,
     START_KEYWORD,
     STOP_KEYWORDS,
@@ -48,8 +49,9 @@ from sms.views.conversation import (
     _section_prompt,
     _session_label,
 )
-from sms.views.flow import _handle_state_message, _send
-from sms.views.telnyx_client import send_sms
+from sms.telnyx_client import send_sms
+from sms.views.auth import SIGNATURE_TOLERANCE_SECONDS, TelnyxSignature
+from sms.views.inbound_state_handler import _handle_state_message
 from sms.views.webhook import (
     PERMANENT_ERROR_CODES,
     RETRY_DELAY_SECONDS,
