@@ -3,8 +3,8 @@ The Telnyx webhook itself: verifies the caller, routes the event, and owns
 everything that happens around the conversation - creating a user on first
 contact, the opt-in/opt-out gate, and retrying a failed send.
 
-The conversation itself lives in flow.py; this module decides whether we get
-that far.
+The conversation itself lives in inbound_state_handler.py; this module decides
+whether we get that far.
 """
 
 import logging
@@ -15,9 +15,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.models import EventLog, User
-from sms.models import ConversationState, MessageHistory, OptInStatus
-from sms.views.auth import TelnyxSignature
-from sms.views.conversation import (
+from sms.conversation import (
     GENERIC_ERROR_MESSAGE,
     HELP_FOLLOWUP_DELAY_SECONDS,
     HELP_KEYWORD,
@@ -27,8 +25,10 @@ from sms.views.conversation import (
     START_KEYWORD,
     STOP_KEYWORDS,
 )
-from sms.views.flow import _handle_state_message, _send
-from sms.views.telnyx_client import send_sms
+from sms.models import ConversationState, MessageHistory, OptInStatus
+from sms.telnyx_client import send_sms
+from sms.views.auth import TelnyxSignature
+from sms.views.inbound_state_handler import _handle_state_message
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +88,7 @@ class TelnyxWebhook(APIView):
           # require it to be answered for anyone who asks, opted out or not. The
           # tailored per-state help follows from _handle_state_message after a beat.
           if keyword == HELP_KEYWORD:
-            _send(user, from_number, HELP_MESSAGE)
+            send_sms(user, from_number, HELP_MESSAGE)
             time.sleep(HELP_FOLLOWUP_DELAY_SECONDS)
 
           # opt-in/opt-out gating sits above messaging state. STOP is handled the
@@ -98,17 +98,17 @@ class TelnyxWebhook(APIView):
           if keyword in STOP_KEYWORDS:
             opt_in_status.is_opted_in = False
             opt_in_status.save()
-            _send(user, from_number, OPT_OUT_MESSAGE)
+            send_sms(user, from_number, OPT_OUT_MESSAGE)
           elif created:
             # first contact is a greeting only - their message isn't a course yet
-            _send(user, from_number, OPT_IN_MESSAGE)
+            send_sms(user, from_number, OPT_IN_MESSAGE)
           elif not opt_in_status.is_opted_in:
             if keyword == START_KEYWORD:
               opt_in_status.is_opted_in = True
               opt_in_status.save()
               user.conversation_state.state = ConversationState.AWAITING_COURSE
               user.conversation_state.save()
-              _send(user, from_number, OPT_IN_MESSAGE)
+              send_sms(user, from_number, OPT_IN_MESSAGE)
             # else: opted out and not a START, stay silent
           else:
             # The conversation flow is where the unanticipated failures live (a
@@ -127,7 +127,7 @@ class TelnyxWebhook(APIView):
               EventLog.objects.create(
                   event_type="error", user=user, message=f"Failed handling message: {text!r}"
               )
-              _send(user, from_number, GENERIC_ERROR_MESSAGE)
+              send_sms(user, from_number, GENERIC_ERROR_MESSAGE)
 
         elif event_type == "message.finalized": # a send was finalized
           errors = message.get("errors") or []
@@ -142,6 +142,6 @@ class TelnyxWebhook(APIView):
             already_retried = RETRY_TAG in (message.get("tags") or [])
             if error_code not in PERMANENT_ERROR_CODES and not already_retried:
               time.sleep(RETRY_DELAY_SECONDS)
-              send_sms(to_numbers[0], text, tags=[RETRY_TAG])
+              send_sms(None, to_numbers[0], text, tags=[RETRY_TAG])
 
         return Response(status=200)

@@ -59,8 +59,13 @@ class SeatOpenedSignalTests(TestCase):
     """
     Nothing else proves find_signals_with_open_seats actually surfaces a
     watched session once seats open, or that seat_opened is receivable with
-    the kwargs a listener (sms's future receiver) would expect. C@B itself
-    is mocked out so this never makes a live network call.
+    the kwargs a listener (sms's receiver, see sms/signals.py) expects. C@B
+    itself is mocked out so this never makes a live network call.
+
+    sms's receiver is connected to this signal app-wide (via sms/apps.py's
+    ready()), so send() below reaches it too, not just the listener this test
+    connects - sms.telnyx_client.send_sms is mocked so that doesn't also
+    place a real Telnyx call.
     """
 
     def setUp(self):
@@ -70,8 +75,11 @@ class SeatOpenedSignalTests(TestCase):
         )
         create_watch(self.user, self.session)
 
+    @patch("sms.signals.send_sms")
     @patch("seat_signal.services.check_seat_availability", return_value=1)
-    def test_open_seat_is_surfaced_and_signal_is_receivable(self, mock_check_seat_availability):
+    def test_open_seat_is_surfaced_and_signal_is_receivable(
+        self, mock_check_seat_availability, mock_send_sms
+    ):
         results = list(find_signals_with_open_seats())
         self.assertEqual(results, [(self.session, [self.user])])
 

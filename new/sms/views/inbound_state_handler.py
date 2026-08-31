@@ -16,13 +16,11 @@ import re
 from django.conf import settings
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models.functions import Greatest
-from django.utils import timezone
 
-from core.models import CourseSession, EventLog
+from core.models import CourseSession
 from seat_signal.services import create_watch, get_watches_for_user, remove_watch
 from seat_signal.utils import get_current_sem_id
-from sms.models import ConversationState, MessageHistory
-from sms.views.conversation import (
+from sms.conversation import (
     CAP_REACHED_MESSAGE,
     CONFIRM_RETRY_MESSAGE,
     EXIT_KEYWORDS,
@@ -48,7 +46,8 @@ from sms.views.conversation import (
     _section_prompt,
     _session_label,
 )
-from sms.views.telnyx_client import send_sms
+from sms.models import ConversationState
+from sms.telnyx_client import send_sms
 
 logger = logging.getLogger(__name__)
 
@@ -60,19 +59,6 @@ COURSE_MATCH_THRESHOLD = 0.3
 # A section is a letter and one or two digits: S01, C2, L10. Whitespace and a
 # missing leading zero are tolerated, since students type it either way.
 SECTION_PATTERN = re.compile(r"^([SCL])\s*(\d{1,2})$", re.IGNORECASE)
-
-
-def _send(user, to_number, text, tags=None):
-    """Sends a text, then records it to the event log and the user's transcript."""
-    send_sms(to_number, text, tags=tags)
-    EventLog.objects.create(event_type="sms_sent", user=user, message=text)
-
-    # Telnyx stamps inbound messages for us; outbound ones we stamp ourselves.
-    history, _ = MessageHistory.objects.get_or_create(user=user)
-    history.messages.append(
-        {"direction": "outbound", "body": text, "at": timezone.now().isoformat()}
-    )
-    history.save()
 
 
 def _active_watches(user):
@@ -117,7 +103,7 @@ def _register_course(conversation_state, text):
     conversation_state.save()
 
     user = conversation_state.user
-    _send(user, user.phone_num, _section_prompt(conversation_state))
+    send_sms(user, user.phone_num, _section_prompt(conversation_state))
 
 
 def _register_section(conversation_state, text):
@@ -149,7 +135,7 @@ def _register_section(conversation_state, text):
     conversation_state.save()
 
     user = conversation_state.user
-    _send(user, user.phone_num, _confirm_prompt(conversation_state))
+    send_sms(user, user.phone_num, _confirm_prompt(conversation_state))
 
 
 def _handle_awaiting_course(user, conversation_state, keyword, text):
@@ -157,26 +143,26 @@ def _handle_awaiting_course(user, conversation_state, keyword, text):
     if keyword == VIEW_KEYWORD:
         watches = list(_active_watches(user))
         if watches:
-            _send(user, user.phone_num, f"{WATCH_LIST_HEADER}\n{_numbered_watches(watches)}")
+            send_sms(user, user.phone_num, f"{WATCH_LIST_HEADER}\n{_numbered_watches(watches)}")
         else:
-            _send(user, user.phone_num, NO_WATCHES_MESSAGE)
+            send_sms(user, user.phone_num, NO_WATCHES_MESSAGE)
     elif keyword == REMOVE_KEYWORD:
         watches = list(_active_watches(user))
         if watches:
             conversation_state.state = ConversationState.AWAITING_REMOVAL
             conversation_state.save()
-            _send(user, user.phone_num, f"{_numbered_watches(watches)}\n{REMOVE_PROMPT}")
+            send_sms(user, user.phone_num, f"{_numbered_watches(watches)}\n{REMOVE_PROMPT}")
         else:
             # nothing to remove, so stay put rather than stranding them in the removal flow
-            _send(user, user.phone_num, NO_WATCHES_MESSAGE)
+            send_sms(user, user.phone_num, NO_WATCHES_MESSAGE)
     # cap check sits below VIEW/REMOVE so a capped user can still get out of it
     elif get_watches_for_user(user).count() >= settings.SIGNAL_CAP:
-        _send(user, user.phone_num, CAP_REACHED_MESSAGE)
+        send_sms(user, user.phone_num, CAP_REACHED_MESSAGE)
     else:
         try:
             _register_course(conversation_state, text)
         except ValueError:
-            _send(user, user.phone_num, f"{_course_not_found_message()} {_course_prompt()}")
+            send_sms(user, user.phone_num, f"{_course_not_found_message()} {_course_prompt()}")
 
 
 def _handle_awaiting_section(user, conversation_state, keyword, text):
@@ -184,7 +170,7 @@ def _handle_awaiting_section(user, conversation_state, keyword, text):
     try:
         _register_section(conversation_state, text)
     except ValueError:
-        _send(
+        send_sms(
             user,
             user.phone_num,
             f"{_section_not_found_message(conversation_state)} "
@@ -208,9 +194,9 @@ def _handle_awaiting_confirmation(user, conversation_state, keyword, text):
         # tack the cap notice on only once this watch fills the last slot
         if get_watches_for_user(user).count() >= settings.SIGNAL_CAP:
             confirmation += f" {CAP_REACHED_MESSAGE}"
-        _send(user, user.phone_num, confirmation)
+        send_sms(user, user.phone_num, confirmation)
     else:
-        _send(user, user.phone_num, CONFIRM_RETRY_MESSAGE)
+        send_sms(user, user.phone_num, CONFIRM_RETRY_MESSAGE)
 
 
 def _handle_awaiting_removal(user, conversation_state, keyword, text):
@@ -225,13 +211,13 @@ def _handle_awaiting_removal(user, conversation_state, keyword, text):
         remove_watch(user, session)
         conversation_state.state = ConversationState.AWAITING_COURSE
         conversation_state.save()
-        _send(
+        send_sms(
             user,
             user.phone_num,
             WATCH_REMOVED_MESSAGE.format(session=_session_label(session)),
         )
     else:
-        _send(user, user.phone_num, REMOVAL_RETRY_MESSAGE)
+        send_sms(user, user.phone_num, REMOVAL_RETRY_MESSAGE)
 
 
 # HELP and EXIT mean the same thing in every state, so they're answered once in
@@ -257,7 +243,7 @@ def _exit_to_course(user, conversation_state):
     """Drops whatever was in progress and returns the user to the default state."""
     conversation_state.state = ConversationState.AWAITING_COURSE
     conversation_state.save()
-    _send(user, user.phone_num, f"{EXIT_MESSAGE} {_course_prompt()}")
+    send_sms(user, user.phone_num, f"{EXIT_MESSAGE} {_course_prompt()}")
 
 
 def _handle_state_message(user, text):
@@ -272,7 +258,7 @@ def _handle_state_message(user, text):
     # the generic help message already went out from post(); what's left is the
     # tailored follow-up for wherever the user is in the flow
     if keyword == HELP_KEYWORD:
-        _send(user, user.phone_num, STATE_HELP[conversation_state.state](conversation_state))
+        send_sms(user, user.phone_num, STATE_HELP[conversation_state.state](conversation_state))
         return
 
     if keyword in EXIT_KEYWORDS:

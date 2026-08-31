@@ -52,10 +52,11 @@ def sign(body: bytes, timestamp: str | None = None, key=_PRIVATE_KEY) -> dict:
 class SmsTestCase(TestCase):
     def setUp(self):
         # Telnyx is never actually called; every send is captured here instead.
-        # send_sms is called from two modules - flow for conversation replies,
-        # webhook for the message.finalized retry - so both names point at one
-        # mock, keeping every send in a single ordered list.
-        send_patcher = patch("sms.views.flow.send_sms")
+        # send_sms is called from two modules - inbound_state_handler for
+        # conversation replies, webhook for the message.finalized retry - so
+        # both names point at one mock, keeping every send in a single ordered
+        # list.
+        send_patcher = patch("sms.views.inbound_state_handler.send_sms")
         self.send_sms = send_patcher.start()
         self.addCleanup(send_patcher.stop)
         retry_patcher = patch("sms.views.webhook.send_sms", self.send_sms)
@@ -123,7 +124,7 @@ class SmsTestCase(TestCase):
 
     def sent(self):
         """The body of every text sent since the last reset, in order."""
-        return [call.args[1] for call in self.send_sms.call_args_list]
+        return [call.args[2] for call in self.send_sms.call_args_list]
 
     def last_sent(self):
         return self.sent()[-1]
