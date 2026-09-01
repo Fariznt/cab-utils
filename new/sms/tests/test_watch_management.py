@@ -12,10 +12,10 @@ from sms.views import (
     NO_WATCHES_MESSAGE,
     REMOVAL_RETRY_MESSAGE,
     REMOVE_PROMPT,
-    WATCH_LIST_HEADER,
     WATCH_REMOVED_MESSAGE,
     _numbered_watches,
     _session_label,
+    watch_list_message,
 )
 
 
@@ -37,7 +37,7 @@ class ViewTests(SmsTestCase):
         self.text("VIEW")
 
         watches = list(get_watches_for_user(user).order_by("datetime_created"))
-        expected = f"{WATCH_LIST_HEADER}\n{_numbered_watches(watches)}"
+        expected = watch_list_message(watches)
         self.assert_sent(expected)
         self.assertIn("1. MATH 0100", expected)
         self.assertIn("2. CSCI 0320", expected)

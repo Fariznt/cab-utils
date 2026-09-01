@@ -21,13 +21,12 @@ COURSE_MATCH_THRESHOLD = 0.3
 # course code pattern accepts.
 DEPARTMENT_ALIASES = {
     "CS": "CSCI",
-    "COMP": "CSCI",
     "BIO": "BIOL",
-    "GEO": "EEPS",
     "MUS": "MUSC",
-    "POLI": "POLS",
+    "POL": "POLS",
     "SOCI": "SOC",
     "ENGI": "ENGN",
+    "MAT": "MATH",
 }
 
 

@@ -36,7 +36,6 @@ from sms.conversation import (
     START_KEYWORD,
     STOP_KEYWORDS,
     VIEW_KEYWORD,
-    WATCH_LIST_HEADER,
     WATCH_REMOVED_MESSAGE,
     _confirm_prompt,
     _course_not_found_message,
@@ -48,6 +47,7 @@ from sms.conversation import (
     _section_not_found_message,
     _section_prompt,
     _session_label,
+    watch_list_message,
 )
 from sms.telnyx_client import send_sms
 from sms.views.auth import SIGNATURE_TOLERANCE_SECONDS, TelnyxSignature
