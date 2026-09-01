@@ -13,6 +13,7 @@ from sms.views import (
     REMOVAL_RETRY_MESSAGE,
     REMOVE_PROMPT,
     WATCH_REMOVED_MESSAGE,
+    _course_prompt,
     _numbered_watches,
     _session_label,
     watch_list_message,
@@ -77,7 +78,8 @@ class RemoveTests(SmsTestCase):
         self.assertEqual(self.conversation_state().state, ConversationState.AWAITING_COURSE)
         self.assertEqual(
             self.last_sent(),
-            WATCH_REMOVED_MESSAGE.format(session=_session_label(self.sessions["MATH 0100"])),
+            f"{WATCH_REMOVED_MESSAGE.format(session=_session_label(self.sessions['MATH 0100']))} "
+            f"{_course_prompt()}",
         )
 
     def test_out_of_range_number_retries_without_removing_anything(self):

@@ -10,7 +10,7 @@ from django.test import override_settings
 from seat_signal.services import create_watch, get_watches_for_user
 from seat_signal.utils import get_sem_str
 from sms.models import ConversationState
-from sms.tests.helpers import CURRENT_SEM_ID, SmsTestCase
+from sms.tests.helpers import CURRENT_SEM_ID, UNCAPPED_FIXTURE_COURSE, SmsTestCase
 from sms.views import (
     CAP_REACHED_MESSAGE,
     CONFIRM_RETRY_MESSAGE,
@@ -21,6 +21,7 @@ from sms.views import (
     SIGNAL_SET_MESSAGE,
     _confirm_prompt,
     _course_prompt,
+    _course_uncapped_message,
     _section_prompt,
 )
 
@@ -59,6 +60,15 @@ class CourseStepTests(SmsTestCase):
                 )
                 self.assert_sent(f"{EXIT_MESSAGE} {_course_prompt()}")
                 self.send_sms.reset_mock()
+
+    def test_uncapped_course_reply_is_rejected_and_stays_at_the_course_step(self):
+        self.onboard()
+
+        self.text(UNCAPPED_FIXTURE_COURSE[0])
+
+        self.assertEqual(self.conversation_state().state, ConversationState.AWAITING_COURSE)
+        self.assertEqual(self.conversation_state().pending_code, "")
+        self.assert_sent(_course_uncapped_message())
 
     def test_at_cap_a_course_reply_gets_the_cap_message_instead(self):
         self.onboard()
