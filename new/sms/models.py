@@ -20,7 +20,8 @@ class ConversationState(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="conversation_state")
     state = models.CharField(max_length=32, choices=STATE_CHOICES, default=AWAITING_COURSE)
     # course/section picked so far, held until confirmed and turned into a SeatSignal
-    pending_code = models.CharField(max_length=9, blank=True)
+    # mirrors CourseSession.code's width, since this holds a copy of that value
+    pending_code = models.CharField(max_length=64, blank=True)
     pending_sem_id = models.CharField(max_length=6, blank=True)
     pending_section = models.CharField(max_length=3, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
