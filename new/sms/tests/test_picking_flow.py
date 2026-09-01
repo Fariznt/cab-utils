@@ -1,10 +1,8 @@
 """
 The course-picking conversation: course -> section -> confirm -> watch created.
-All course/section replies here are exactly formatted (match a real
-CourseSession's code/section verbatim) since _register_course/_register_section
-take text as-is for now (see their TODOs in views.py) - trigram/regex matching,
-and the not-found messages that depend on it, get their own tests once that
-matching lands.
+Replies here are exactly formatted (matching a fixture CourseSession verbatim)
+so these tests stay about the flow - how a reply resolves to a course or section
+is test_matching.py's job.
 """
 
 from django.test import override_settings
@@ -222,71 +220,3 @@ class FullTranscriptTests(SmsTestCase):
             SIGNAL_SET_MESSAGE.format(session=label()),
         )
         self.assertTrue(get_watches_for_user(self.user()).exists())
-
-
-class CourseMatchingTests(SmsTestCase):
-    """
-    Trigram matching against code and title together, so a student can reply
-    with either and doesn't have to know which we wanted.
-    """
-
-    def setUp(self):
-        super().setUp()
-        self.onboard()
-
-    def _matched_code(self, reply):
-        self.set_state(ConversationState.AWAITING_COURSE)
-        self.text(reply)
-        return self.conversation_state().pending_code
-
-    def test_matches_a_code_typed_loosely(self):
-        for reply in ["CSCI 0320", "csci 0320", "CSCI0320"]:
-            with self.subTest(reply=reply):
-                self.assertEqual(self._matched_code(reply), "CSCI 0320")
-
-    def test_matches_on_the_title_instead_of_the_code(self):
-        # "Introduction to Software Engineering" - the user never types a code
-        self.assertEqual(self._matched_code("software engineering"), "CSCI 0320")
-
-    def test_unrelated_text_is_not_forced_onto_some_course(self):
-        self.set_state(ConversationState.AWAITING_COURSE)
-        self.send_sms.reset_mock()
-
-        self.text("zzzzqqq nonsense")
-
-        self.assertEqual(self.conversation_state().pending_code, "")
-        self.assertEqual(self.conversation_state().state, ConversationState.AWAITING_COURSE)
-        self.assertIn("Could not find that course", self.last_sent())
-
-
-class SectionMatchingTests(SmsTestCase):
-    """Sections are parsed by regex, then checked against the course's real ones."""
-
-    def setUp(self):
-        super().setUp()
-        self.onboard()
-        self.set_state(ConversationState.AWAITING_SECTION, code="CSCI 0320")
-
-    def test_accepts_a_missing_leading_zero_and_stray_space(self):
-        for reply in ["S01", "s1", "S 1", "s 01"]:
-            with self.subTest(reply=reply):
-                self.set_state(ConversationState.AWAITING_SECTION, code="CSCI 0320")
-                self.text(reply)
-                self.assertEqual(self.conversation_state().pending_section, "S01")
-
-    def test_rejects_a_section_the_course_does_not_have(self):
-        self.send_sms.reset_mock()
-
-        self.text("S99")  # well-formed, but CSCI 0320 only has S01
-
-        self.assertEqual(self.conversation_state().pending_section, "")
-        self.assertEqual(self.conversation_state().state, ConversationState.AWAITING_SECTION)
-        self.assertIn("Could not find that section for CSCI 0320", self.last_sent())
-
-    def test_rejects_text_that_is_not_a_section_code(self):
-        self.send_sms.reset_mock()
-
-        self.text("the first one")
-
-        self.assertEqual(self.conversation_state().pending_section, "")
-        self.assertIn("Could not find that section", self.last_sent())
