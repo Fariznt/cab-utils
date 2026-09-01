@@ -70,13 +70,13 @@ class SmsTestCase(TestCase):
         self.addCleanup(sleep_patcher.stop)
 
         self.url = reverse("sms:telnyx-webhook")
-        self.sessions = {
-            code: CourseSession.objects.create(
-                crn=f"1000{i}", code=code, section="S01",
-                sem_id=CURRENT_SEM_ID, title=title,
+        self.sessions = {}
+        for i, (code, title) in enumerate(FIXTURE_COURSES):
+            department_code, _, course_code = code.partition(" ")
+            self.sessions[code] = CourseSession.objects.create(
+                crn=f"1000{i}", department_code=department_code, course_code=course_code,
+                section="S01", sem_id=CURRENT_SEM_ID, title=title,
             )
-            for i, (code, title) in enumerate(FIXTURE_COURSES)
-        }
 
     # Request builders
 

@@ -162,7 +162,7 @@ def _handle_awaiting_course(user, conversation_state, keyword, text):
         try:
             _register_course(conversation_state, text)
         except ValueError:
-            send_sms(user, user.phone_num, f"{_course_not_found_message()} {_course_prompt()}")
+            send_sms(user, user.phone_num, _course_not_found_message())
 
 
 def _handle_awaiting_section(user, conversation_state, keyword, text):
@@ -170,12 +170,7 @@ def _handle_awaiting_section(user, conversation_state, keyword, text):
     try:
         _register_section(conversation_state, text)
     except ValueError:
-        send_sms(
-            user,
-            user.phone_num,
-            f"{_section_not_found_message(conversation_state)} "
-            f"{_section_prompt(conversation_state)}",
-        )
+        send_sms(user, user.phone_num, _section_not_found_message(conversation_state))
 
 
 def _handle_awaiting_confirmation(user, conversation_state, keyword, text):

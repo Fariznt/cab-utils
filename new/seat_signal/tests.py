@@ -43,7 +43,10 @@ class CreateWatchTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(phone_num="+15551234567")
         self.sessions = [
-            CourseSession.objects.create(crn=str(i), code=f"CSCI 0{i}", section="S01", sem_id="202410", title="Test")
+            CourseSession.objects.create(
+                crn=str(i), department_code="CSCI", course_code=f"0{i}",
+                section="S01", sem_id="202410", title="Test",
+            )
             for i in range(3)
         ]
 
@@ -71,7 +74,8 @@ class SeatOpenedSignalTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(phone_num="+15559876543")
         self.session = CourseSession.objects.create(
-            crn="99999", code="CSCI 0320", section="S01", sem_id="202410", title="Test"
+            crn="99999", department_code="CSCI", course_code="0320",
+            section="S01", sem_id="202410", title="Test",
         )
         create_watch(self.user, self.session)
 

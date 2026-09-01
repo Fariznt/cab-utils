@@ -63,7 +63,7 @@ CONFIRM_RETRY_MESSAGE = (
 
 # Seat signal viewing and removal, both reachable from the default AWAITING_COURSE state.
 WATCH_LIST_HEADER = "Your active seat signals:"
-NO_WATCHES_MESSAGE = "You don't have any active seat signals."
+NO_WATCHES_MESSAGE = "You don't have any active seat signals. What course would you like to watch for seats?"
 REMOVE_PROMPT = "Which one would you like to remove? Reply with its number, or EXIT to cancel."
 REMOVAL_RETRY_MESSAGE = (
     "Sorry, I don't understand. Reply with the number of the seat signal to remove, "
@@ -99,14 +99,21 @@ def _help_confirmation_message(conversation_state):
 
 
 def _course_not_found_message():
-    return f"Could not find that course in {get_sem_str(get_current_sem_id())}."
+    return (
+        f"Could not find that course. Which {get_sem_str(get_current_sem_id())} course would "
+        "you like to watch for seats? Reply VIEW to see your active seat signals, or REMOVE to "
+        "delete one."
+    )
 
 
 def _section_not_found_message(conversation_state):
-    return f"Could not find that section for {_pending_course_label(conversation_state)}."
+    return (
+        f"Could not find that section for {_pending_course_label(conversation_state)}. "
+        "Reply with a section code like 'S02' or 'L01'."
+    )
 
 SIGNAL_SET_MESSAGE = (
-  "Seat signal for {session} has been set. To view course sessions being watched, reply VIEW."
+  "Seat signal for {session} has been set. To view course sessions being watched, reply VIEW. "
   "To remove a course session, reply REMOVE."
 )
 CAP_REACHED_MESSAGE = (
@@ -119,9 +126,10 @@ GENERIC_ERROR_MESSAGE = (
 
 # Sent by sms/signals.py's seat_opened receiver - the poll loop already deleted
 # the SeatSignal by the time this goes out, so this is a one-shot alert, not a
-# recurring one.
+# recurring one. No semester here - the user just picked this course, so naming
+# it back would be needless clutter in an urgent, act-now message.
 SEAT_OPENED_MESSAGE = (
-    "A seat opened up for {session}! This seat signal has been used. Reply with "
+    "A seat is available for {session}! This seat signal has been used. Reply with "
     "a course name to set a new one."
 )
 
@@ -149,6 +157,11 @@ def _pending_session_label(conversation_state):
 def _session_label(session):
     """Human-readable course session, e.g. 'CSCI 0320 S01 (Fall 2026)'."""
     return f"{session.code} {session.section} ({get_sem_str(session.sem_id)})"
+
+
+def _session_label_no_sem(session):
+    """Course session without the semester, e.g. 'CSCI 0320 S01'."""
+    return f"{session.code} {session.section}"
 
 
 def _numbered_watches(watches):
