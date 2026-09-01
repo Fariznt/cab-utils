@@ -32,7 +32,6 @@ from sms.conversation import (
     REMOVE_PROMPT,
     SIGNAL_SET_MESSAGE,
     VIEW_KEYWORD,
-    WATCH_LIST_HEADER,
     WATCH_REMOVED_MESSAGE,
     _confirm_prompt,
     _course_not_found_message,
@@ -42,10 +41,11 @@ from sms.conversation import (
     _section_not_found_message,
     _section_prompt,
     _session_label,
+    watch_list_message,
 )
-from sms.match_utils import match_course, match_section
 from sms.models import ConversationState
 from sms.telnyx_client import send_sms
+from sms.views.match_utils import match_course, match_section
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ def _handle_awaiting_course(user, conversation_state, keyword, text):
     if keyword == VIEW_KEYWORD:
         watches = list(get_watches_for_user(user))
         if watches:
-            send_sms(user, user.phone_num, f"{WATCH_LIST_HEADER}\n{_numbered_watches(watches)}")
+            send_sms(user, user.phone_num, watch_list_message(watches))
         else:
             send_sms(user, user.phone_num, NO_WATCHES_MESSAGE)
     elif keyword == REMOVE_KEYWORD:
@@ -169,6 +169,17 @@ def _exit_to_course(user, conversation_state):
 
 
 def _handle_state_message(user, text):
+    """
+    Handles the inbound SMS message and updates the conversation state accordingly. 
+    Opt-in/opt-out logic is handled by parent function in sms/views/webhook.py
+
+    Args:
+        user: The User object representing the user sending the SMS.
+        text: The text of the SMS message.
+
+    Returns:
+        None.
+    """
     conversation_state = user.conversation_state
     text = (text or "").strip()
     keyword = text.upper()

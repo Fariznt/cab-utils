@@ -62,7 +62,6 @@ CONFIRM_RETRY_MESSAGE = (
 )
 
 # Seat signal viewing and removal, both reachable from the default AWAITING_COURSE state.
-WATCH_LIST_HEADER = "Your active seat signals:"
 NO_WATCHES_MESSAGE = "You don't have any active seat signals. What course would you like to watch for seats?"
 REMOVE_PROMPT = "Which one would you like to remove? Reply with its number, or EXIT to cancel."
 REMOVAL_RETRY_MESSAGE = (
@@ -169,3 +168,8 @@ def _numbered_watches(watches):
     return "\n".join(
         f"{i}. {_session_label(watch.session)}" for i, watch in enumerate(watches, start=1)
     )
+
+
+def watch_list_message(watches):
+    """Full VIEW reply: header, the numbered list, and how to remove one."""
+    return f"Your active seat signals:\n{_numbered_watches(watches)}\nTo remove one, reply REMOVE."

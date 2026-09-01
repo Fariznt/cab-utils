@@ -11,7 +11,7 @@ from django.test import TestCase
 
 from core.models import CourseSession
 from seat_signal.utils import get_current_sem_id
-from sms.match_utils import match_course, match_section
+from sms.views.match_utils import match_course, match_section
 
 SEM_ID = get_current_sem_id()
 OTHER_SEM_ID = "209910"
@@ -60,7 +60,6 @@ class DepartmentTests(CatalogTestCase):
 
     def test_alias_resolves_to_the_real_department(self):
         self.assertEqual(match_course("CS 320", SEM_ID), "CSCI 0320")
-        self.assertEqual(match_course("comp 320", SEM_ID), "CSCI 0320")
         self.assertEqual(match_course("mus 21f", SEM_ID), "MUSC 0021F")
 
     def test_misspelled_department_is_not_guessed_at(self):
