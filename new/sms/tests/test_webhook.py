@@ -220,7 +220,7 @@ class StateMessageErrorHandlingTests(SmsTestCase):
     def test_unhandled_exception_gets_a_generic_reply_and_is_logged(self):
         self.onboard()
 
-        with patch("sms.views.inbound_state_handler._register_course", side_effect=RuntimeError("boom")):
+        with patch("sms.views.inbound_state_handler.match_course", side_effect=RuntimeError("boom")):
             response = self.text("CSCI 0320")
 
         self.assertEqual(response.status_code, 200)
@@ -247,8 +247,8 @@ class StateMessageErrorHandlingTests(SmsTestCase):
 
     def test_error_in_any_state_is_recovered_the_same_way(self):
         targets = {
-            ConversationState.AWAITING_COURSE: "sms.views.inbound_state_handler._register_course",
-            ConversationState.AWAITING_SECTION: "sms.views.inbound_state_handler._register_section",
+            ConversationState.AWAITING_COURSE: "sms.views.inbound_state_handler.match_course",
+            ConversationState.AWAITING_SECTION: "sms.views.inbound_state_handler.match_section",
         }
         self.onboard()
         for state, target in targets.items():

@@ -54,7 +54,7 @@ def remove_watch(user: User, session: CourseSession) -> bool:
 
 
 def get_watches_for_user(user: User):
-    return SeatSignal.objects.filter(user=user).select_related("session")
+    return SeatSignal.objects.filter(user=user).select_related("session").order_by("datetime_created")
 
 
 def check_seat_availability(session: CourseSession) -> int:
