@@ -36,6 +36,9 @@ FIXTURE_COURSES = [
     ("CSCI 0330", "Introduction to Computer Systems"),
     ("MATH 0100", "Introductory Calculus, Part II"),
 ]
+# Independent-study-style course: every section uncapped, for exercising the
+# uncapped-rejection path in the course step.
+UNCAPPED_FIXTURE_COURSE = ("APMA 1970", "Independent Study")
 
 
 def sign(body: bytes, timestamp: str | None = None, key=_PRIVATE_KEY) -> dict:
@@ -69,6 +72,17 @@ class SmsTestCase(TestCase):
         sleep_patcher.start()
         self.addCleanup(sleep_patcher.stop)
 
+        # C@B is never actually called; the course-picking step's live uncapped
+        # check goes through this instead. Every fixture course reports a real
+        # seat count except UNCAPPED_FIXTURE_COURSE, which reports None (C@B's
+        # own "no seat count" signal), the way an independent study genuinely does.
+        check_seats_patcher = patch(
+            "seat_signal.services.check_seat_availability",
+            side_effect=lambda session: None if session.crn == "20000" else 5,
+        )
+        check_seats_patcher.start()
+        self.addCleanup(check_seats_patcher.stop)
+
         self.url = reverse("sms:telnyx-webhook")
         self.sessions = {}
         for i, (code, title) in enumerate(FIXTURE_COURSES):
@@ -77,6 +91,12 @@ class SmsTestCase(TestCase):
                 crn=f"1000{i}", department_code=department_code, course_code=course_code,
                 section="S01", sem_id=CURRENT_SEM_ID, title=title,
             )
+        uncapped_code, uncapped_title = UNCAPPED_FIXTURE_COURSE
+        department_code, _, course_code = uncapped_code.partition(" ")
+        self.sessions[uncapped_code] = CourseSession.objects.create(
+            crn="20000", department_code=department_code, course_code=course_code,
+            section="S01", sem_id=CURRENT_SEM_ID, title=uncapped_title,
+        )
 
     # Request builders
 

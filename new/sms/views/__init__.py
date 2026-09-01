@@ -40,6 +40,7 @@ from sms.conversation import (
     _confirm_prompt,
     _course_not_found_message,
     _course_prompt,
+    _course_uncapped_message,
     _help_confirmation_message,
     _numbered_watches,
     _pending_course_label,

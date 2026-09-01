@@ -21,7 +21,10 @@ def main():
     args = parser.parse_args()
 
     seats = check_seat_availability(CourseSession(crn=args.crn))
-    print(f"crn {args.crn}: {seats} seat(s) available")
+    if seats is None:
+        print(f"crn {args.crn}: no seat count reported (uncapped/permission-based section)")
+    else:
+        print(f"crn {args.crn}: {seats} seat(s) available")
 
 
 if __name__ == "__main__":

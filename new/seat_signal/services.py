@@ -57,19 +57,36 @@ def get_watches_for_user(user: User):
     return SeatSignal.objects.filter(user=user).select_related("session").order_by("datetime_created")
 
 
-def check_seat_availability(session: CourseSession) -> int:
+def check_seat_availability(session: CourseSession) -> int | None:
     """
-    Hits C@B's details endpoint and returns the open seat count. C@B has no
-    plain numeric seats field, the count is embedded in an HTML fragment, so
-    it's scraped by string-partition.
+    Hits C@B's details endpoint and returns the open seat count, or None if
+    C@B reports no seat count at all for this section. That's not an error:
+    permission-based sections (independent studies, directed research, and
+    reportedly others depending on the term) genuinely have no numeric cap,
+    so "undefined" is the correct value, not 0 or an exception.
     """
     payload = {"key": f"crn:{session.crn}"}
     response = requests.post(DETAILS_URL, json=payload, headers=SPOOFED_HEADERS)
     response.raise_for_status()
     course_details = response.json()
 
-    seats_string = course_details["seats"].partition('<span class="seats_avail">')[2].partition("</span>")[0]
+    seats_html = course_details["seats"]
+    if not seats_html:
+        return None
+    seats_string = seats_html.partition('<span class="seats_avail">')[2].partition("</span>")[0]
     return int(seats_string)
+
+
+def course_is_uncapped(code: str, sem_id: str) -> bool:
+    """
+    True only if every current section of this course has no seat count at
+    all. Checked live against C@B rather than inferred from any course
+    metadata (e.g. schedule type) - which sections work this way isn't stable
+    enough to hardcode, and used to include sections beyond independent
+    study/directed research.
+    """
+    sessions = list(CourseSession.objects.filter(code=code, sem_id=sem_id))
+    return bool(sessions) and all(check_seat_availability(s) is None for s in sessions)
 
 
 def get_sessions_with_active_signals():
@@ -89,6 +106,6 @@ def find_signals_with_open_seats():
         except Exception:
             logger.exception(f"Failed to check seat availability for {session}")
             continue
-        if seat_count > 0:
+        if seat_count is not None and seat_count > 0:
             users = list(User.objects.filter(user_signals__session=session))
             yield session, users

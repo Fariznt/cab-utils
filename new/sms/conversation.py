@@ -105,6 +105,13 @@ def _course_not_found_message():
     )
 
 
+def _course_uncapped_message():
+    return (
+        "That course is uncapped, so there is nothing to watch for. "
+        f"Which {get_sem_str(get_current_sem_id())} course would you like to watch for seats?"
+    )
+
+
 def _section_not_found_message(conversation_state):
     return (
         f"Could not find that section for {_pending_course_label(conversation_state)}. "

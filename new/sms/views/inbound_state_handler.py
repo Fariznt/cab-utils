@@ -15,7 +15,7 @@ import logging
 from django.conf import settings
 
 from core.models import CourseSession
-from seat_signal.services import create_watch, get_watches_for_user, remove_watch
+from seat_signal.services import course_is_uncapped, create_watch, get_watches_for_user, remove_watch
 from seat_signal.utils import get_current_sem_id
 from sms.conversation import (
     CAP_REACHED_MESSAGE,
@@ -36,6 +36,7 @@ from sms.conversation import (
     _confirm_prompt,
     _course_not_found_message,
     _course_prompt,
+    _course_uncapped_message,
     _help_confirmation_message,
     _numbered_watches,
     _section_not_found_message,
@@ -76,6 +77,11 @@ def _handle_awaiting_course(user, conversation_state, keyword, text):
         code = match_course(text, sem_id)
         if code is None:
             send_sms(user, user.phone_num, _course_not_found_message())
+            return
+        # checked live against C@B rather than inferred, since which sections
+        # work this way isn't stable enough to hardcode (see course_is_uncapped)
+        if course_is_uncapped(code, sem_id):
+            send_sms(user, user.phone_num, _course_uncapped_message())
             return
         # only the best match is taken; confirmation is what catches a wrong guess
         conversation_state.pending_code = code
@@ -136,7 +142,7 @@ def _handle_awaiting_removal(user, conversation_state, keyword, text):
         send_sms(
             user,
             user.phone_num,
-            WATCH_REMOVED_MESSAGE.format(session=_session_label(session)),
+            f"{WATCH_REMOVED_MESSAGE.format(session=_session_label(session))} {_course_prompt()}",
         )
     else:
         send_sms(user, user.phone_num, REMOVAL_RETRY_MESSAGE)
