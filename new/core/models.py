@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
+from django.db.models.functions import Concat
 
 from core.fields import EncryptedPhoneField
 from core.managers import UserManager
@@ -26,9 +27,18 @@ class User(AbstractBaseUser, PermissionsMixin):
 class CourseSession(models.Model):
     """One row per (course, section, semester) offering, synced from C@B."""
     crn = models.CharField(max_length=5)
+    # Split out of C@B's combined "CSCI 0320" code so future lookups can search
+    # on department/course number separately. code below reassembles them for
+    # every place that still wants the combined form.
+    department_code = models.CharField(max_length=16)
     # Generous width: C@B's code format isn't guaranteed stable across semesters
-    # (e.g. cross-listed courses can produce longer codes than a plain "CSCI 0320").
-    code = models.CharField(max_length=64)
+    # (e.g. cross-listed courses can produce longer codes than a plain "0320").
+    course_code = models.CharField(max_length=64)
+    code = models.GeneratedField(
+        expression=Concat("department_code", models.Value(" "), "course_code"),
+        output_field=models.CharField(max_length=64),
+        db_persist=True,
+    )
     section = models.CharField(max_length=3)
     sem_id = models.CharField(max_length=6)
     title = models.CharField(max_length=255)

@@ -10,7 +10,7 @@ from django.dispatch import receiver
 
 from core.models import EventLog
 from seat_signal.signals import seat_opened
-from sms.conversation import SEAT_OPENED_MESSAGE, _session_label
+from sms.conversation import SEAT_OPENED_MESSAGE, _session_label_no_sem
 from sms.telnyx_client import send_sms
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ def send_seat_opened_text(sender, user, session, **kwargs):
     # abort the rest of that pass - the same per-user isolation the loop
     # already has around each course check.
     try:
-        text = SEAT_OPENED_MESSAGE.format(session=_session_label(session))
+        text = SEAT_OPENED_MESSAGE.format(session=_session_label_no_sem(session))
         send_sms(user, user.phone_num, text)
     except Exception:
         logger.exception(f"Failed to send seat_opened text for user {user.pk}")

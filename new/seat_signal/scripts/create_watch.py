@@ -38,8 +38,10 @@ def main():
     if session is None:
         if not (args.code and args.section):
             parser.error("--code and --section are required to create a new CourseSession")
+        department_code, _, course_code = args.code.partition(" ")
         session = CourseSession.objects.create(
-            crn=args.crn, sem_id=args.sem_id, code=args.code, section=args.section, title=args.title,
+            crn=args.crn, sem_id=args.sem_id, department_code=department_code,
+            course_code=course_code, section=args.section, title=args.title,
         )
         print(f"Created course session {session}")
 

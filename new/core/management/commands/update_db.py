@@ -53,10 +53,16 @@ class Command(BaseCommand):
             self.stderr.write(self.style.ERROR(f"Failed to fetch course data: {e}"))
             return
 
-        rows = [
-            (cd.get("crn"), cd.get("code"), cd.get("no"), cd.get("srcdb"), cd.get("title"))
-            for cd in course_data["results"]
-        ]
+        rows = []
+        for cd in course_data["results"]:
+            # C@B's code comes back as one combined string, e.g. "CSCI 0320".
+            # Split on the first space only, so anything unusual after the
+            # department (e.g. a cross-listed code) stays intact in course_code.
+            department_code, _, course_code = cd.get("code", "").partition(" ")
+            rows.append((
+                cd.get("crn"), department_code, course_code,
+                cd.get("no"), cd.get("srcdb"), cd.get("title"),
+            ))
 
         # Batched insert in one transaction, roughly 200x faster than per-row
         # ORM get_or_create().
@@ -65,8 +71,8 @@ class Command(BaseCommand):
         # this for a semester already synced just skips already-known rows.
         table = CourseSession._meta.db_table
         sql = f"""
-            INSERT INTO {table} (crn, code, section, sem_id, title)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO {table} (crn, department_code, course_code, section, sem_id, title)
+            VALUES (%s, %s, %s, %s, %s, %s)
             ON CONFLICT (crn, sem_id) DO NOTHING
         """
         with transaction.atomic():

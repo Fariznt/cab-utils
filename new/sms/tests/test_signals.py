@@ -19,7 +19,8 @@ class SeatOpenedReceiverTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(phone_num=USER_NUMBER)
         self.session = CourseSession.objects.create(
-            crn="99999", code="CSCI 0320", section="S01", sem_id="202410", title="Test"
+            crn="99999", department_code="CSCI", course_code="0320",
+            section="S01", sem_id="202410", title="Test",
         )
         send_patcher = patch("sms.signals.send_sms")
         self.send_sms = send_patcher.start()
