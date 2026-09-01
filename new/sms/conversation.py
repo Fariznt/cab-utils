@@ -8,6 +8,8 @@ inbound_state_handler.py's job. Keeping the copy in one file means reworking
 wording never means opening the webhook or the flow logic.
 """
 
+from django.conf import settings
+
 from core.models import CourseSession
 from seat_signal.utils import get_current_sem_id, get_sem_str
 
@@ -21,7 +23,7 @@ OPT_IN_MESSAGE = (
     "Seat Signal: Hello! We'll help you watch a course section and contact you "
     "the moment a seat opens. Msg frequency may vary. Msg&data rates may apply. "
     "Reply HELP for options, STOP to opt out. Terms & Privacy at "
-    "https://seatsignal.fariz.cc/#privacy. What course would you like to watch for seats?"
+    f"{settings.PRIVACY_URL}. What course would you like to watch for seats?"
 )
 OPT_OUT_MESSAGE = (
     "Seat Signal: You are unsubscribed and will receive no further messages. "
@@ -82,12 +84,12 @@ def _course_prompt():
 def _section_prompt(conversation_state):
     return (
         f"Which section of {_pending_course_label(conversation_state)}? "
-        "Reply with a section code like 'S01'."
+        "Reply with a section code like 'S02' or 'L01'."
     )
 
 
 def _confirm_prompt(conversation_state):
-    return f"Is this correct? {_pending_session_label(conversation_state)}"
+    return f"Is {_pending_session_label(conversation_state)} what you want to watch for seats? Reply YES to confirm, or EXIT to leave the course picking flow."
 
 
 def _help_confirmation_message(conversation_state):

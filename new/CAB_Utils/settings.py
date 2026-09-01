@@ -33,6 +33,7 @@ REQUIRED_ENV_VARS = [
     "TELNYX_API_KEY",
     "TELNYX_PUBLIC_KEY",
     "TELNYX_PHONE_NUMBER",
+    "PRIVACY_URL",
 ]
 missing_vars = [var for var in REQUIRED_ENV_VARS if os.environ.get(var) is None]
 if missing_vars:
@@ -58,6 +59,9 @@ TELNYX_API_KEY = os.environ["TELNYX_API_KEY"]
 # signatures (see sms.views.auth.TelnyxSignature).
 TELNYX_PUBLIC_KEY = os.environ["TELNYX_PUBLIC_KEY"]
 TELNYX_PHONE_NUMBER = os.environ["TELNYX_PHONE_NUMBER"]
+
+# Terms & Privacy link sent in the SMS opt-in message (sms/conversation.py).
+PRIVACY_URL = os.environ["PRIVACY_URL"]
 
 
 # Application definition

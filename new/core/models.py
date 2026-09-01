@@ -26,7 +26,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 class CourseSession(models.Model):
     """One row per (course, section, semester) offering, synced from C@B."""
     crn = models.CharField(max_length=5)
-    code = models.CharField(max_length=9)
+    # Generous width: C@B's code format isn't guaranteed stable across semesters
+    # (e.g. cross-listed courses can produce longer codes than a plain "CSCI 0320").
+    code = models.CharField(max_length=64)
     section = models.CharField(max_length=3)
     sem_id = models.CharField(max_length=6)
     title = models.CharField(max_length=255)
