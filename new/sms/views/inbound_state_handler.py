@@ -30,7 +30,6 @@ from sms.conversation import (
     REMOVAL_RETRY_MESSAGE,
     REMOVE_KEYWORD,
     REMOVE_PROMPT,
-    SIGNAL_SET_MESSAGE,
     VIEW_KEYWORD,
     WATCH_REMOVED_MESSAGE,
     _confirm_prompt,
@@ -42,6 +41,7 @@ from sms.conversation import (
     _section_not_found_message,
     _section_prompt,
     _session_label,
+    _signal_set_message,
     watch_list_message,
 )
 from sms.models import ConversationState
@@ -114,11 +114,12 @@ def _handle_awaiting_confirmation(user, conversation_state, keyword, text):
             section=conversation_state.pending_section,
             sem_id=conversation_state.pending_sem_id,
         )
+        show_tip = not user.has_created_watch
         create_watch(user, session)
         conversation_state.state = ConversationState.AWAITING_COURSE
         conversation_state.save()
 
-        confirmation = SIGNAL_SET_MESSAGE.format(session=_session_label(session))
+        confirmation = _signal_set_message(session, show_tip)
         # tack the cap notice on only once this watch fills the last slot
         if get_watches_for_user(user).count() >= settings.SIGNAL_CAP:
             confirmation += f" {CAP_REACHED_MESSAGE}"

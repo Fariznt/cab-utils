@@ -16,6 +16,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(auto_now_add=True)
+    # Flips true on the user's first-ever SeatSignal, so the confirmation
+    # message only shows the save-contact/notification tip once.
+    has_created_watch = models.BooleanField(default=False)
 
     USERNAME_FIELD = "phone_num"
     objects = UserManager()

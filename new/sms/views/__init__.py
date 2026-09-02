@@ -32,7 +32,6 @@ from sms.conversation import (
     REMOVE_KEYWORD,
     REMOVE_PROMPT,
     SEAT_OPENED_MESSAGE,
-    SIGNAL_SET_MESSAGE,
     START_KEYWORD,
     STOP_KEYWORDS,
     VIEW_KEYWORD,
@@ -48,6 +47,7 @@ from sms.conversation import (
     _section_not_found_message,
     _section_prompt,
     _session_label,
+    _signal_set_message,
     watch_list_message,
 )
 from sms.telnyx_client import send_sms
