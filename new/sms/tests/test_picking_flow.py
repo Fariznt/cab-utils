@@ -8,7 +8,6 @@ is test_matching.py's job.
 from django.test import override_settings
 
 from seat_signal.services import create_watch, get_watches_for_user
-from seat_signal.utils import get_sem_str
 from sms.models import ConversationState
 from sms.tests.helpers import CURRENT_SEM_ID, UNCAPPED_FIXTURE_COURSE, SmsTestCase
 from sms.views import (
@@ -18,16 +17,12 @@ from sms.views import (
     EXIT_MESSAGE,
     GENERIC_ERROR_MESSAGE,
     OPT_IN_MESSAGE,
-    SIGNAL_SET_MESSAGE,
     _confirm_prompt,
     _course_prompt,
     _course_uncapped_message,
     _section_prompt,
+    _signal_set_message,
 )
-
-
-def label(code="CSCI 0320", section="S01", sem_id=CURRENT_SEM_ID):
-    return f"{code} {section} ({get_sem_str(sem_id)})"
 
 
 class CourseStepTests(SmsTestCase):
@@ -122,7 +117,14 @@ class ConfirmationStepTests(SmsTestCase):
         watches = list(get_watches_for_user(self.user()))
         self.assertEqual([w.session for w in watches], [self.sessions["CSCI 0320"]])
         self.assertEqual(self.conversation_state().state, ConversationState.AWAITING_COURSE)
-        self.assert_sent(SIGNAL_SET_MESSAGE.format(session=label()))
+        self.assert_sent(_signal_set_message(self.sessions["CSCI 0320"], show_tip=True))
+
+    def test_tip_is_not_repeated_after_the_first_watch(self):
+        create_watch(self.user(), self.sessions["CSCI 0330"])
+
+        self.text("YES")
+
+        self.assert_sent(_signal_set_message(self.sessions["CSCI 0320"], show_tip=False))
 
     def test_yes_is_case_and_whitespace_insensitive(self):
         self.text("  yes ")
@@ -227,6 +229,6 @@ class FullTranscriptTests(SmsTestCase):
             OPT_IN_MESSAGE,
             _section_prompt(conversation_state),
             _confirm_prompt(conversation_state),
-            SIGNAL_SET_MESSAGE.format(session=label()),
+            _signal_set_message(self.sessions["CSCI 0320"], show_tip=True),
         )
         self.assertTrue(get_watches_for_user(self.user()).exists())

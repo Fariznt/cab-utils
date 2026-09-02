@@ -39,6 +39,9 @@ def create_watch(user: User, session: CourseSession) -> SeatSignal:
             event_type="watch_created", user=user, session=session,
             message=f"Watch created for {session}",
         )
+        if not user.has_created_watch:
+            user.has_created_watch = True
+            user.save(update_fields=["has_created_watch"])
     return watch
 
 

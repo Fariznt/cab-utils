@@ -118,10 +118,21 @@ def _section_not_found_message(conversation_state):
         "Reply with a section code like 'S02' or 'L01'."
     )
 
-SIGNAL_SET_MESSAGE = (
-  "Seat signal for {session} has been set. To view course sessions being watched, reply VIEW. "
-  "To remove a course session, reply REMOVE."
+SIGNAL_SET_TIP = (
+    " TIP: Add this number as a contact and configure notifications with a "
+    "unique sound so you don't miss it!"
 )
+
+
+def _signal_set_message(session, show_tip):
+    """Watch-confirmation reply. show_tip is True only on a user's first-ever watch."""
+    message = (
+        f"Seat signal for {_session_label(session)} has been set. To view course "
+        "sessions being watched, reply VIEW. To remove a course session, reply REMOVE."
+    )
+    if show_tip:
+        message += SIGNAL_SET_TIP
+    return message
 CAP_REACHED_MESSAGE = (
     "That's the most seat signals you can have at once, so remove one before adding another."
 )
