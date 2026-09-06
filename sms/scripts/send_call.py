@@ -24,6 +24,7 @@ def main():
         TELNYX_CALLS_URL,
         json={"connection_id": "placeholder", "from": from_number, "to": to_number},
         headers={"Authorization": f"Bearer {api_key}"},
+        timeout=(5, 15),
     )
     try:
         response.raise_for_status()

@@ -8,6 +8,7 @@ This is the one place it's exercised for real.
 
 from unittest.mock import patch
 
+import requests
 from django.test import TestCase, override_settings
 
 from core.models import EventLog, User
@@ -33,6 +34,7 @@ class SendSmsTests(TestCase):
             TELNYX_MESSAGES_URL,
             json={"from": SERVICE_NUMBER, "to": USER_NUMBER, "text": "hello there"},
             headers={"Authorization": "Bearer test-key"},
+            timeout=(5, 15),
         )
 
     def test_tags_are_included_when_given(self):
@@ -57,14 +59,14 @@ class SendSmsTests(TestCase):
             [(m["direction"], m["body"]) for m in messages], [("outbound", "hello there")]
         )
 
-    def test_a_failed_send_is_not_logged(self):
-        self.post.return_value.raise_for_status.side_effect = RuntimeError("telnyx down")
+    def test_a_failed_send_is_logged_as_an_error_not_a_success(self):
+        self.post.return_value.raise_for_status.side_effect = requests.Timeout("telnyx down")
 
-        with self.assertRaises(RuntimeError):
-            send_sms(self.user, USER_NUMBER, "hello there")
+        send_sms(self.user, USER_NUMBER, "hello there")  # must not raise
 
         self.assertFalse(EventLog.objects.filter(event_type="sms_sent").exists())
         self.assertFalse(MessageHistory.objects.exists())
+        self.assertTrue(EventLog.objects.filter(event_type="error", user=self.user).exists())
 
     def test_no_bookkeeping_without_a_user(self):
         # the message.finalized retry path (webhook.py) resends with no user in

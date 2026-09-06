@@ -1,3 +1,5 @@
+import logging
+
 import requests
 from django.conf import settings
 from django.utils import timezone
@@ -5,13 +7,21 @@ from django.utils import timezone
 from core.models import EventLog
 from sms.models import MessageHistory
 
+logger = logging.getLogger(__name__)
+
 TELNYX_MESSAGES_URL = "https://api.telnyx.com/v2/messages"
 
 
 def send_sms(user, to_number: str, text: str, tags: list[str] | None = None) -> None:
     """
     Sends one text via Telnyx, then records it to the event log and the user's
-    transcript. Raises on failure - callers decide how to handle it.
+    transcript. Never raises: a network error, timeout, or non-2xx from Telnyx
+    is logged (same error-log pattern as everywhere else in the app) and
+    swallowed. Callers - most of them mid-webhook-request - don't need their
+    own try/except, and Telnyx always gets its 200 back regardless of whether
+    the outbound text actually went out. A timed-out send is genuinely
+    ambiguous (Telnyx may or may not have received it), so retrying here would
+    risk double-texting someone; that's worse than the rare dropped message.
 
     `user` may be None for a raw resend with no user record to log against
     (the message.finalized retry in webhook.py) - the original attempt already
@@ -23,12 +33,20 @@ def send_sms(user, to_number: str, text: str, tags: list[str] | None = None) -> 
     payload = {"from": settings.TELNYX_PHONE_NUMBER, "to": to_number, "text": text}
     if tags:
         payload["tags"] = tags
-    response = requests.post(
-        TELNYX_MESSAGES_URL,
-        json=payload,
-        headers={"Authorization": f"Bearer {settings.TELNYX_API_KEY}"},
-    )
-    response.raise_for_status()
+    try:
+        response = requests.post(
+            TELNYX_MESSAGES_URL,
+            json=payload,
+            headers={"Authorization": f"Bearer {settings.TELNYX_API_KEY}"},
+            timeout=(5, 15),
+        )
+        response.raise_for_status()
+    except requests.RequestException:
+        logger.exception(f"Failed to send SMS to {to_number}")
+        EventLog.objects.create(
+            event_type="error", level="ERROR", user=user, message=f"Failed to send SMS: {text!r}"
+        )
+        return
 
     if user is None:
         return

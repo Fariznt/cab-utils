@@ -77,7 +77,7 @@ def check_seat_availability(session: CourseSession) -> int | None:
     so "undefined" is the correct value, not 0 or an exception.
     """
     payload = {"key": f"crn:{session.crn}"}
-    response = requests.post(DETAILS_URL, json=payload, headers=SPOOFED_HEADERS)
+    response = requests.post(DETAILS_URL, json=payload, headers=SPOOFED_HEADERS, timeout=(5, 15))
     response.raise_for_status()
     course_details = response.json()
 

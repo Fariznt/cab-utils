@@ -21,6 +21,7 @@ def main():
         TELNYX_MESSAGES_URL,
         json={"from": from_number, "to": to_number, "text": "Ping! This is a test message sent by a developer to a developer phone number."},
         headers={"Authorization": f"Bearer {api_key}"},
+        timeout=(5, 15),
     )
     try:
         response.raise_for_status()
