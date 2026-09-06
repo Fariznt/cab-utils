@@ -45,7 +45,7 @@ class Command(BaseCommand):
             ],
         }
         try:
-            response = requests.post(SEARCH_URL, json=search_payload, headers=SPOOFED_HEADERS)
+            response = requests.post(SEARCH_URL, json=search_payload, headers=SPOOFED_HEADERS, timeout=(5, 15))
             response.raise_for_status()
             course_data = response.json()
         except requests.RequestException as e:
