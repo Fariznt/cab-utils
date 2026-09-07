@@ -1,10 +1,14 @@
 from django.contrib import admin
+from django.http import HttpResponse
 from django.urls import include, path
 
 from sms.views import TelnyxStatusWebhook
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # Liveness check only. Deliberately touches no database, so a slow Postgres
+    # can't get the web tier marked dead.
+    path("healthz/", lambda request: HttpResponse("ok"), name="healthz"),
     path("sms/", include("sms.urls")),
     path("ops/", include("ops.urls")),
     # Lives outside the sms prefix because the URL is fixed in Telnyx's 10DLC
