@@ -77,13 +77,12 @@ class EventLog(models.Model):
         ("sms_received", "SMS received"),
         ("sms_sent", "SMS sent"),
         ("seat_found", "Seat found"),
-        ("poll_cycle", "Poll cycle"),
         ("error", "Error"),
     ]
 
     # Python's own logging level names, reused verbatim: core/signals.py maps a
-    # row straight onto logging via getattr(logging, level), and settings.py's
-    # REVIEW_THRESHOLD gates the review.log handler with the same vocabulary.
+    # row straight onto logging via getattr(logging, level), so a row's level is
+    # what the log destination filters and alarms on downstream.
     LEVELS = [
         ("DEBUG", "Debug"),
         ("INFO", "Info"),

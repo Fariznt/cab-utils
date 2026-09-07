@@ -9,7 +9,6 @@ This file has no AWS awareness and no dev/prod branching of its own.
 """
 
 import base64
-import logging
 import os
 from pathlib import Path
 
@@ -34,7 +33,6 @@ REQUIRED_ENV_VARS = [
     "TELNYX_PUBLIC_KEY",
     "TELNYX_PHONE_NUMBER",
     "PRIVACY_URL",
-    "REVIEW_THRESHOLD",
     "POLL_ERROR_LIMIT",
 ]
 missing_vars = [var for var in REQUIRED_ENV_VARS if os.environ.get(var) is None]
@@ -63,12 +61,6 @@ TELNYX_PHONE_NUMBER = os.environ["TELNYX_PHONE_NUMBER"]
 
 # Terms & Privacy link sent in the SMS opt-in message (sms/conversation.py).
 PRIVACY_URL = os.environ["PRIVACY_URL"]
-
-# Log level at/above which a record also lands in logs/review.log, the file
-# CloudWatch watches for alerting. Same vocabulary as core.models.EventLog.LEVELS.
-REVIEW_THRESHOLD = logging.getLevelNamesMapping().get(os.environ["REVIEW_THRESHOLD"])
-if REVIEW_THRESHOLD is None:
-    raise ValueError("REVIEW_THRESHOLD must be a logging level name (e.g. ERROR)")
 
 # Consecutive C@B check failures before poll_seats gives up and exits for systemd
 # to restart
@@ -163,16 +155,19 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-# Logging --- JSON lines to two rotating files: app.log gets everything (so
-# update_db/poll_seats' logger.info calls and the poll loop's heartbeat land
-# somewhere durable), review.log gets only REVIEW_THRESHOLD and above. The split
-# is what makes alerting cheap downstream: CloudWatch alarms on review.log's line
-# count, with no log parsing, since the filtering already happened here.
-# EventLog rows reach both through core/signals.py.
+# Logging --- JSON lines to stdout and to one file. Everything lands in app.log;
+# picking the serious records out of it is the log destination's job, not this
+# file's. In prod that's a CloudWatch metric filter on {$.level = "ERROR"} feeding
+# an alarm, which is the same filtering a second level-gated handler here would
+# do, minus a second copy of every error line. EventLog rows reach it through
+# core/signals.py.
 #
-# Both files rotate: at maxBytes the handler renames app.log -> app.log.1 (older
-# backups shifting down, the oldest past backupCount deleted) and starts fresh,
-# capping disk use at roughly maxBytes * (backupCount + 1) per file.
+# WatchedFileHandler, and nothing rotates the file: gunicorn's workers and
+# poll_seats all write this one path, and a rotating handler inside each of them
+# would race to rename it out from under the others. Appending concurrently is
+# safe; rotating concurrently is not. If the file ever needs bounding, logrotate
+# is the thing to do it, and WatchedFileHandler already reopens the file when it
+# sees the inode change.
 LOGS_DIR = BASE_DIR / "logs"
 LOGS_DIR.mkdir(exist_ok=True)
 
@@ -185,26 +180,17 @@ LOGGING = {
     "handlers": {
         "console": {"class": "logging.StreamHandler", "formatter": "json"},
         "file": {
-            "class": "logging.handlers.RotatingFileHandler",
+            "class": "logging.handlers.WatchedFileHandler",
             "filename": LOGS_DIR / "app.log",
-            "maxBytes": 10 * 1024 * 1024,
-            "backupCount": 5,
-            "formatter": "json",
-        },
-        "review_file": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOGS_DIR / "review.log",
-            "level": REVIEW_THRESHOLD,
-            "maxBytes": 10 * 1024 * 1024,
-            "backupCount": 5,
             "formatter": "json",
         },
     },
     "root": {
-        # review_file sits on the root logger, so it catches both the EventLog
-        # rows bridged by core/signals.py and every plain logger.error/exception
-        # call already in the codebase, with no per-call-site changes.
-        "handlers": ["console", "file", "review_file"],
+        # The file handler sits on the root logger, so it catches both the
+        # EventLog rows bridged by core/signals.py and every plain
+        # logger.error/exception call already in the codebase, with no
+        # per-call-site changes.
+        "handlers": ["console", "file"],
         "level": "INFO",
     },
 }
