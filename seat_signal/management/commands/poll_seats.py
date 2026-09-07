@@ -3,9 +3,7 @@ import random
 import time
 
 from django.core.management.base import BaseCommand
-from django.utils import timezone
 
-from core.models import EventLog
 from seat_signal.models import SeatSignal
 from seat_signal.services import find_signals_with_open_seats
 from seat_signal.signals import seat_opened
@@ -34,7 +32,7 @@ class Command(BaseCommand):
                 time.sleep(random.uniform(2, 4))
 
             # Heartbeat: distinguishes "running normally" from "died silently".
-            now = timezone.now()
-            logger.info(f"Poll cycle complete as of {now.isoformat()}")
-            EventLog.objects.create(event_type="poll_cycle", message=f"Poll cycle complete, {checked} open seat(s) found")
+            # A log line instead of EventLog row.. polling pollutes the log. 
+            # Cloudwatch integration should still be done---alarm on absence of heartbeat
+            logger.info(f"Poll cycle complete, {checked} open seat(s) found")
             time.sleep(10)

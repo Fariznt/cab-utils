@@ -1,7 +1,6 @@
 import logging
 import uuid
 
-from django.conf import settings
 from django.db import transaction
 from django.test import TestCase
 
@@ -35,9 +34,9 @@ class EncryptedPhoneFieldTests(TestCase):
 
 class EventLogBridgeTests(TestCase):
     """
-    core/signals.py is what puts EventLog rows in front of the level-gated
-    handlers in settings.py, so it has to fire at the row's own level, carry
-    enough context to identify the row, and stay silent for a rolled-back one.
+    core/signals.py is what puts EventLog rows in front of the handlers in
+    settings.py, so it has to fire at the row's own level, carry enough context
+    to identify the row, and stay silent for a rolled-back one.
     """
 
     def test_row_is_logged_at_its_own_level(self):
@@ -49,7 +48,7 @@ class EventLogBridgeTests(TestCase):
 
     def test_message_carries_user_context(self):
         # account_created writes no message, so the user id is all that
-        # identifies it once it reaches review.log.
+        # identifies it once it reaches the log.
         user = User.objects.create_user(phone_num="+15551234567")
         with self.assertLogs("cab_utils.events", level="DEBUG") as logs:
             with self.captureOnCommitCallbacks(execute=True):
@@ -70,33 +69,26 @@ def _root_handler(name):
 
 class LoggingConfigTests(TestCase):
     """
-    Pins down settings.py's LOGGING dict itself: review_file must only accept
-    REVIEW_THRESHOLD and above, file must accept everything, and a record
-    logged through them actually ends up in the right file(s) on disk. This is
-    the routing every EventLog write (via the bridge above) and every plain
-    logger.error/exception call in the codebase relies on.
+    Pins down settings.py's LOGGING dict itself: one unfiltered file handler
+    that everything reaches, whatever its level. This is the routing every
+    EventLog write (via the bridge above) and every plain logger.error/exception
+    call in the codebase relies on. There is deliberately no level-gated second
+    handler to assert on - separating the serious records out happens at the log
+    destination (a CloudWatch metric filter), not here.
     """
-
-    def test_review_file_gated_at_review_threshold(self):
-        self.assertEqual(_root_handler("review_file").level, settings.REVIEW_THRESHOLD)
 
     def test_file_accepts_everything(self):
         self.assertEqual(_root_handler("file").level, logging.NOTSET)
 
-    def test_only_review_threshold_and_above_reaches_review_log(self):
+    def test_records_reach_app_log_at_every_level(self):
         marker = uuid.uuid4().hex
         logger = logging.getLogger("cab_utils.events")
-        logger.info("below threshold %s", marker)
-        logger.error("at threshold %s", marker)
+        logger.info("info %s", marker)
+        logger.error("error %s", marker)
         for handler in logging.getLogger().handlers:
             handler.flush()
 
-        with open(_root_handler("review_file").baseFilename) as f:
-            review_log = f.read()
-        self.assertNotIn(f"below threshold {marker}", review_log)
-        self.assertIn(f"at threshold {marker}", review_log)
-
         with open(_root_handler("file").baseFilename) as f:
             app_log = f.read()
-        self.assertIn(f"below threshold {marker}", app_log)
-        self.assertIn(f"at threshold {marker}", app_log)
+        self.assertIn(f"info {marker}", app_log)
+        self.assertIn(f"error {marker}", app_log)

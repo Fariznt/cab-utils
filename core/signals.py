@@ -6,9 +6,9 @@ from django.dispatch import receiver
 
 from core.models import EventLog
 
-# Every EventLog row is mirrored onto this logger, so the level-gated handlers
-# in settings.py (app.log for everything, review.log for >= REVIEW_THRESHOLD)
-# are the single place routing is decided. Call sites just write the row.
+# Every EventLog row is mirrored onto this logger at the row's own level, so it
+# lands in app.log alongside every plain logger call and is filtered downstream
+# by level like anything else. Call sites just write the row.
 events_logger = logging.getLogger("cab_utils.events")
 
 
@@ -18,7 +18,7 @@ def log_event(sender, instance, created, **kwargs):
         return
 
     # Context the message may not carry on its own - account_created, for one,
-    # writes no message at all - so no review.log line is anonymous.
+    # writes no message at all - so no logged row is anonymous.
     parts = [instance.message or instance.event_type]
     if instance.user_id:
         parts.append(f"user={instance.user_id}")
