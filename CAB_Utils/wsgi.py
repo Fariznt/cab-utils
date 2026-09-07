@@ -8,9 +8,14 @@ https://docs.djangoproject.com/en/6.1/howto/deployment/wsgi/
 """
 
 import os
+from pathlib import Path
 
 from django.core.wsgi import get_wsgi_application
+from dotenv import load_dotenv
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'CAB_Utils.settings')
+# Locally .env supplies DJANGO_SETTINGS_MODULE; in prod the process
+# environment does. gunicorn loads this module, so it defaults to prod.
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'CAB_Utils.settings.prod')
 
 application = get_wsgi_application()
