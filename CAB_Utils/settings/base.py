@@ -15,14 +15,13 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Loads .env if present. 
 load_dotenv(BASE_DIR / ".env")
 
 REQUIRED_ENV_VARS = [
     "SECRET_KEY",
-    "DEBUG",
     "ALLOWED_HOSTS",
     "POSTGRES_DB",
     "POSTGRES_USER",
@@ -43,7 +42,6 @@ if missing_vars:
     raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
 
 SECRET_KEY = os.environ["SECRET_KEY"]
-DEBUG = os.environ["DEBUG"].lower() in ("1", "true", "yes")
 ALLOWED_HOSTS = [h.strip() for h in os.environ["ALLOWED_HOSTS"].split(",") if h.strip()]
 
 # AES-256-SIV key for core.fields.EncryptedPhoneField, base64-encoded 64 bytes.
