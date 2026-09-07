@@ -15,6 +15,12 @@ docker compose up -d db
 # run migrations
 python manage.py migrate
 
+# collect admin/DRF static files into STATIC_ROOT for whitenoise to serve.
+# Dev doesn't strictly need it (DEBUG=True lets runserver serve them from the
+# app dirs), but running it here keeps the step from being forgotten in deploy,
+# where DEBUG=False means whitenoise serves STATIC_ROOT or nothing at all.
+python manage.py collectstatic --noinput
+
 # run background polling loop
 python manage.py poll_seats &
 POLL_PID=$!

@@ -77,6 +77,7 @@ class EventLog(models.Model):
         ("sms_received", "SMS received"),
         ("sms_sent", "SMS sent"),
         ("seat_found", "Seat found"),
+        ("campaign_status", "Campaign status"),
         ("error", "Error"),
     ]
 

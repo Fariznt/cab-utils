@@ -57,5 +57,6 @@ from sms.views.webhook import (
     PERMANENT_ERROR_CODES,
     RETRY_DELAY_SECONDS,
     RETRY_TAG,
+    TelnyxStatusWebhook,
     TelnyxWebhook,
 )

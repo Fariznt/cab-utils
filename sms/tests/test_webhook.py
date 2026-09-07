@@ -9,6 +9,7 @@ import time
 from unittest.mock import patch
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from django.urls import reverse
 
 from core.models import EventLog, User
 from sms.models import ConversationState, MessageHistory
@@ -263,3 +264,31 @@ class StateMessageErrorHandlingTests(SmsTestCase):
                 self.assertEqual(response.status_code, 200)
                 self.assert_sent(GENERIC_ERROR_MESSAGE)
                 self.assertTrue(EventLog.objects.filter(event_type="error").exists())
+
+
+class CampaignStatusTests(SmsTestCase):
+    """The 10DLC campaign status webhook: signed like any other Telnyx call,
+    and its payload recorded verbatim at CRITICAL."""
+
+    def post_status(self, payload, headers=None):
+        body = json.dumps(payload).encode()
+        return self.client.post(
+            reverse("telnyx-status-update"),
+            data=body,
+            content_type="application/json",
+            headers=sign(body) if headers is None else headers,
+        )
+
+    def test_status_update_is_logged_as_critical(self):
+        response = self.post_status({"campaignId": "CAB1", "status": "SUSPENDED"})
+
+        self.assertEqual(response.status_code, 200)
+        event = EventLog.objects.get(event_type="campaign_status")
+        self.assertEqual(event.level, "CRITICAL")
+        self.assertIn("SUSPENDED", event.message)
+
+    def test_unsigned_status_update_is_rejected(self):
+        response = self.post_status({"status": "SUSPENDED"}, headers={})
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(EventLog.objects.exists())

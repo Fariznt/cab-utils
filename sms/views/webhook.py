@@ -146,3 +146,23 @@ class TelnyxWebhook(APIView):
               send_sms(None, to_numbers[0], text, tags=[RETRY_TAG])
 
         return Response(status=200)
+
+
+class TelnyxStatusWebhook(APIView):
+    """
+    Telnyx's 10DLC campaign status updates (registration approved, rejected,
+    suspended). Nothing here is acted on programmatically - a campaign going
+    down means messaging stops, so the whole payload is recorded at CRITICAL
+    for a human to read.
+    """
+
+    authentication_classes = []
+    permission_classes = [TelnyxSignature]
+
+    def post(self, request):
+        EventLog.objects.create(
+            event_type="campaign_status",
+            level="CRITICAL",
+            message=f"Telnyx campaign status update: {request.data}",
+        )
+        return Response(status=200)
