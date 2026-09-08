@@ -150,8 +150,7 @@ class TelnyxWebhook(APIView):
 
 class TelnyxStatusWebhook(APIView):
     """
-    Telnyx's 10DLC campaign status updates (registration approved, rejected,
-    suspended). Nothing here is acted on programmatically - a campaign going
+    Telnyx's 10DLC campaign status updates. Nothing here is acted on programmatically - a campaign going
     down means messaging stops, so the whole payload is recorded at CRITICAL
     for a human to read.
     """

@@ -133,6 +133,7 @@ def _signal_set_message(session, show_tip):
     if show_tip:
         message += SIGNAL_SET_TIP
     return message
+
 CAP_REACHED_MESSAGE = (
     "That's the most seat signals you can have at once, so remove one before adding another."
 )
