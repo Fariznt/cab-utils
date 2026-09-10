@@ -2,9 +2,13 @@ import datetime
 from unittest.mock import patch
 
 from django.test import TestCase, override_settings
+from django.urls import reverse
+from django.utils import timezone
 
+from CAB_Utils.urls import POLL_MAX_AGE
 from core.models import CourseSession, EventLog, User
 from seat_signal import services, utils
+from seat_signal.models import Heartbeat
 from seat_signal.utils import (
     CALENDAR_TIMEZONE,
     REGISTRATION_PERIODS,
@@ -143,6 +147,64 @@ class PollCircuitBreakerTests(TestCase):
             list(find_signals_with_open_seats())  # would be the 5th failure without the reset
 
         self.assertFalse(EventLog.objects.filter(level="CRITICAL").exists())
+
+
+class PassFailureTrackingTests(TestCase):
+    """
+    poll_seats only bumps its heartbeat after a pass where every check
+    succeeded, and services.last_pass_failures is what tells it that. If this
+    stopped reflecting reality, a loop failing every C@B call would still look
+    alive to /healthz/.
+    """
+
+    def setUp(self):
+        services._consecutive_failures = 0
+        self.user = User.objects.create_user(phone_num="+15553334444")
+        self.session = CourseSession.objects.create(
+            crn="54321", department_code="CSCI", course_code="0200",
+            section="S01", sem_id="202410", title="Test",
+        )
+        create_watch(self.user, self.session)
+
+    @override_settings(POLL_ERROR_LIMIT=10)
+    def test_counts_only_the_most_recent_pass(self):
+        with patch("seat_signal.services.check_seat_availability", side_effect=RuntimeError("boom")):
+            list(find_signals_with_open_seats())
+            self.assertEqual(services.last_pass_failures, 1)
+        # A clean pass clears it, so one bad pass doesn't mark the loop dead forever.
+        with patch("seat_signal.services.check_seat_availability", return_value=0):
+            list(find_signals_with_open_seats())
+            self.assertEqual(services.last_pass_failures, 0)
+
+
+class HealthzTests(TestCase):
+    """
+    /healthz/ is what an external uptime check alarms on, so a poll loop that
+    has died or stopped completing clean passes has to show up as a non-200.
+    """
+
+    def _get(self):
+        return self.client.get(reverse("healthz"))
+
+    def _set_heartbeat(self, age):
+        Heartbeat.objects.update_or_create(
+            name=Heartbeat.POLL_SEATS, defaults={"last_seen": timezone.now() - age}
+        )
+
+    def test_no_heartbeat_at_all_is_unhealthy(self):
+        self.assertEqual(self._get().status_code, 503)
+
+    def test_fresh_heartbeat_is_healthy(self):
+        self._set_heartbeat(datetime.timedelta(seconds=10))
+        response = self._get()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["status"], "ok")
+
+    def test_stale_heartbeat_is_unhealthy(self):
+        self._set_heartbeat(POLL_MAX_AGE + datetime.timedelta(seconds=1))
+        response = self._get()
+        self.assertEqual(response.status_code, 503)
+        self.assertEqual(response.json()["status"], "degraded")
 
 
 def _at(year, month, day, hour=12, minute=0, tz=CALENDAR_TIMEZONE):

@@ -27,6 +27,12 @@ SPOOFED_HEADERS = {
 # and lets systemd restart it, alerting once instead of on a loop.
 _consecutive_failures = 0
 
+# Failures during the most recent pass, reset at the start of each one. The poll
+# loop reads it to decide whether that pass counts as a healthy one for the
+# heartbeat: a loop that's spinning but failing every check isn't alive in any
+# useful sense.
+last_pass_failures = 0
+
 
 class SignalCapExceeded(Exception):
     """Raised when a user tries to watch more sessions than settings.SIGNAL_CAP."""
@@ -111,8 +117,9 @@ def find_signals_with_open_seats():
     failure (bad response, C@B format change, etc.) from the rest of the pass,
     so a single bad course doesn't abort checking everything after it.
     """
-    global _consecutive_failures
+    global _consecutive_failures, last_pass_failures
 
+    last_pass_failures = 0
     for session in get_sessions_with_active_signals():
         try:
             seat_count = check_seat_availability(session)
@@ -123,6 +130,7 @@ def find_signals_with_open_seats():
                 message=f"Failed to check seat availability for {session}",
             )
             _consecutive_failures += 1
+            last_pass_failures += 1
             if _consecutive_failures >= settings.POLL_ERROR_LIMIT:
                 message = f"Poll loop shutting down after {_consecutive_failures} consecutive seat-check failures"
                 logger.critical(message)
