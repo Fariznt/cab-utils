@@ -10,7 +10,7 @@ whether we get that far.
 import logging
 import time
 
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -62,19 +62,25 @@ class TelnyxWebhook(APIView):
         logger.info(f"event_type={event_type} from={from_number} text={text!r}")
 
         if event_type == "message.received": # a client message was received
+          # create user if not exists
           try:
             user = User.objects.get(phone_num=from_number)
             created = False
           except User.DoesNotExist:
-            user = User.objects.create_user(phone_num=from_number)
-            created = True
+            try:
+              with transaction.atomic():
+                user = User.objects.create_user(phone_num=from_number)
+              created = True
+              EventLog.objects.create(event_type="account_created", user=user, message=None)
+            except IntegrityError:
+              # Lost a race with a concurrent delivery of this same first
+              # message - the other worker created the row, so use theirs.
+              user = User.objects.get(phone_num=from_number)
+              created = False
 
-          if created: # set up initial state for user
-            opt_in_status = OptInStatus.objects.create(user=user)
-            ConversationState.objects.create(user=user)
-            EventLog.objects.create(event_type="account_created", user=user, message=None)
-          else:
-            opt_in_status = user.opt_in_status
+          # get state + user opt-in status (for new accounts/django superuser with no opt-in status, defaults true)
+          opt_in_status, _ = OptInStatus.objects.get_or_create(user=user)
+          ConversationState.objects.get_or_create(user=user)
 
           # append message to user's message history
           history, _ = MessageHistory.objects.get_or_create(user=user)

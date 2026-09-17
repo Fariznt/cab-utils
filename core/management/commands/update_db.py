@@ -23,14 +23,14 @@ SPOOFED_HEADERS = {
 class Command(BaseCommand):
     help = (
         "Fetches course data for a given semester ID and updates the course database. "
-        'E.g. "python manage.py update_db 202410" to update Fall 2025, or 99999 for '
+        'E.g. "python manage.py update_db 202410" to update Fall 2025, or 999999 for '
         "all current semesters."
     )
 
     def add_arguments(self, parser):
         parser.add_argument(
             "search_id", type=int,
-            help="Semester identifier (see seat_signal/utils.py for the id format), or 99999 for current semesters.",
+            help="Semester identifier (see seat_signal/utils.py for the id format), or 999999 for current semesters.",
         )
 
     def handle(self, *args, **options):

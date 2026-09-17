@@ -98,6 +98,45 @@ class EventRoutingTests(SmsTestCase):
 
 
 class NewUserOnboardingTests(SmsTestCase):
+    def test_losing_the_create_race_uses_the_other_workers_user(self):
+        # Two concurrent deliveries of the same first message. The other worker
+        # already committed its User, but this request's lookup ran before that
+        # - so the create collides on the unique phone_num. It should fall back
+        # to the winner's row, not 500.
+        winner = User.objects.create_user(phone_num=USER_NUMBER)
+        real_get = User.objects.get
+        lookups = []
+
+        def miss_once(*args, **kwargs):
+            # Only the view's first lookup misses; the fallback one must succeed.
+            lookups.append(1)
+            if len(lookups) == 1:
+                raise User.DoesNotExist
+            return real_get(*args, **kwargs)
+
+        with patch.object(User.objects, "get", side_effect=miss_once):
+            response = self.text("hello")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.filter(phone_num=USER_NUMBER).count(), 1)
+        self.assertEqual(self.user().pk, winner.pk)
+        # The collision must not poison the rest of the request's queries.
+        self.assertTrue(self.user().opt_in_status.is_opted_in)
+
+    def test_user_created_outside_the_sms_path_is_backfilled(self):
+        # createsuperuser writes a User with no OptInStatus/ConversationState -
+        # core can't create sms's models. Texting in used to 500 forever on the
+        # missing reverse accessor.
+        User.objects.create_superuser(phone_num=USER_NUMBER, password="x")
+
+        response = self.text("hello")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.user().opt_in_status.is_opted_in)
+        self.assertEqual(
+            self.conversation_state().state, ConversationState.AWAITING_COURSE
+        )
+
     def test_first_message_creates_an_opted_in_user_at_the_course_step(self):
         self.text("hello")
 
