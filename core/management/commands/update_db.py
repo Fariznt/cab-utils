@@ -20,6 +20,51 @@ SPOOFED_HEADERS = {
 }
 
 
+def fetch_rows(search_id):
+    """Fetches a semester's offerings from C@B, flattened into insert-ready tuples."""
+    search_payload = {
+        "other": {"srcdb": search_id},
+        "criteria": [
+            {"field": "is_ind_study", "value": "N"},
+            {"field": "is_canc", "value": "N"},
+        ],
+    }
+    response = requests.post(SEARCH_URL, json=search_payload, headers=SPOOFED_HEADERS, timeout=(5, 15))
+    response.raise_for_status()
+
+    rows = []
+    for cd in response.json()["results"]:
+        # C@B's code comes back as one combined string, e.g. "CSCI 0320".
+        # Split on the first space only, so anything unusual after the
+        # department (e.g. a cross-listed code) stays intact in course_code.
+        department_code, _, course_code = cd.get("code", "").partition(" ")
+        rows.append((
+            cd.get("crn"), department_code, course_code,
+            cd.get("no"), cd.get("srcdb"), cd.get("title"),
+        ))
+    return rows
+
+
+def bulk_insert(rows):
+    """
+    Batched insert in one transaction, far faster than per-row ORM
+    get_or_create() (measured in core/scripts/README.md).
+
+    ON CONFLICT DO NOTHING against (crn, sem_id): CourseSession's PK is a
+    surrogate id (crn alone isn't unique across semesters), so re-running this
+    for a semester already synced just skips already-known rows.
+    """
+    table = CourseSession._meta.db_table
+    sql = f"""
+        INSERT INTO {table} (crn, department_code, course_code, section, sem_id, title)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        ON CONFLICT (crn, sem_id) DO NOTHING
+    """
+    with transaction.atomic():
+        with connection.cursor() as cursor:
+            cursor.executemany(sql, rows)
+
+
 class Command(BaseCommand):
     help = (
         "Fetches course data for a given semester ID and updates the course database. "
@@ -37,47 +82,14 @@ class Command(BaseCommand):
         search_id = options["search_id"]
         self.stdout.write(f"Fetching course data for search_id={search_id}")
 
-        search_payload = {
-            "other": {"srcdb": search_id},
-            "criteria": [
-                {"field": "is_ind_study", "value": "N"},
-                {"field": "is_canc", "value": "N"},
-            ],
-        }
         try:
-            response = requests.post(SEARCH_URL, json=search_payload, headers=SPOOFED_HEADERS, timeout=(5, 15))
-            response.raise_for_status()
-            course_data = response.json()
+            rows = fetch_rows(search_id)
         except requests.RequestException as e:
             logger.error(f"Failed to fetch course data: {e}")
             self.stderr.write(self.style.ERROR(f"Failed to fetch course data: {e}"))
             return
 
-        rows = []
-        for cd in course_data["results"]:
-            # C@B's code comes back as one combined string, e.g. "CSCI 0320".
-            # Split on the first space only, so anything unusual after the
-            # department (e.g. a cross-listed code) stays intact in course_code.
-            department_code, _, course_code = cd.get("code", "").partition(" ")
-            rows.append((
-                cd.get("crn"), department_code, course_code,
-                cd.get("no"), cd.get("srcdb"), cd.get("title"),
-            ))
-
-        # Batched insert in one transaction, roughly 200x faster than per-row
-        # ORM get_or_create().
-        # ON CONFLICT DO NOTHING against (crn, sem_id): CourseSession's PK is
-        # a surrogate id (crn alone isn't unique across semesters), so re-running
-        # this for a semester already synced just skips already-known rows.
-        table = CourseSession._meta.db_table
-        sql = f"""
-            INSERT INTO {table} (crn, department_code, course_code, section, sem_id, title)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            ON CONFLICT (crn, sem_id) DO NOTHING
-        """
-        with transaction.atomic():
-            with connection.cursor() as cursor:
-                cursor.executemany(sql, rows)
+        bulk_insert(rows)
 
         logger.info(f"update_db complete: search_id={search_id}, {len(rows)} rows fetched")
         self.stdout.write(self.style.SUCCESS(f"Database update complete ({len(rows)} rows fetched)."))
