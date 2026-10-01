@@ -46,14 +46,6 @@ def fetch_rows(search_id):
 
 
 def bulk_insert(rows):
-    """
-    Batched insert in one transaction, far faster than per-row ORM
-    get_or_create().
-
-    ON CONFLICT DO NOTHING against (crn, sem_id): CourseSession's PK is a
-    surrogate id (crn alone isn't unique across semesters), so re-running this
-    for a semester already synced just skips already-known rows.
-    """
     table = CourseSession._meta.db_table
     sql = f"""
         INSERT INTO {table} (crn, department_code, course_code, section, sem_id, title)

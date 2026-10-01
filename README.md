@@ -1,31 +1,38 @@
 # CAB Utils
 
-SMS-based seat-opening alerts for Brown University course registration (C@B) — text a number to watch a course section, get texted back when a seat opens.
+SMS seat alerts for Brown University course registration (C@B). Text the number, pick a course section, and get a text when a seat opens.
+
+C@B has no public API. This project talks to its internal endpoints directly, as reverse-engineered from the network calls the C@B site makes.
+
+## Architecture
+
+Django + DRF, Postgres, Telnyx for SMS. Four apps with a one-way dependency graph: `core` ← `seat_signal` ← (`sms`, `ops`).
+
+| App | Purpose |
+|---|---|
+| `core` | `User` (phone number as identity, AES-SIV encrypted), `CourseSession` (synced from C@B), `EventLog` (shared audit log). |
+| `seat_signal` | Watch logic and the `poll_seats` loop that checks C@B for open seats. Fires a `seat_opened` signal and knows nothing about SMS. |
+| `sms` | Telnyx webhook, the rule-based conversation flow, and the `seat_opened` receiver that sends the alert. |
+| `ops` | Placeholder for a staff-only view over `EventLog`. |
+
+`/healthz/` reports whether the poll loop's heartbeat is recent.
 
 ## Usage
 
 ```bash
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env   # fill in required vars, see comments in the file
-docker compose up -d db
-python manage.py migrate
-python manage.py runserver
+cp .env.example .env    # fill in, see comments in the file
+./run-dev               # Postgres, migrations, poll loop, Cloudflare tunnel, dev server
 ```
 
-Management commands:
-- `python manage.py update_db <search_id>` — sync `CourseSession`s from C@B for a semester (see `core/management/commands/update_db.py` for `search_id` format).
-- `python manage.py poll_seats` — runs the seat-availability poll loop (`seat_signal`); long-running, meant for a supervised process (systemd in prod).
+- `python manage.py update_db <search_id>` syncs a semester's sections from C@B (`999999` for all current semesters).
+- `python manage.py poll_seats` runs the seat-check loop.
 
-## App structure
+### Building something else on C@B
 
-One-way dependency graph: `core` ← `seat_signal` ← (`sms`, `ops`).
+This repo works as a starting point for other C@B tools. The C@B-specific pieces are already done and independent of Seat Signal:
 
-| App | Purpose |
-|---|---|
-| `core` | Foundational data: `User` (phone-number identity), `CourseSession` (synced from C@B), `EventLog` (shared audit log). No interface logic. |
-| `seat_signal` | Domain logic for watching a course/section and polling C@B for open seats. No views/urls — fires a `seat_opened` signal on notify. |
-| `sms` | *(stencil — not yet implemented)* Telnyx-facing webhook + conversation flow; listens for `seat_opened`. |
-| `ops` | *(stencil — not yet implemented)* Staff-only log viewer over `core`'s `EventLog`. |
-
-Postgres (via `docker-compose.yml`, service `db`) is required locally — SQLite won't do (`pg_trgm` trigram search, encrypted fields).
+- **Course data**: `update_db` pulls every section of a semester into Postgres in one batched insert. `CourseSession` is the table to extend.
+- **Seat details**: `check_seat_availability` in `seat_signal/services.py` shows how to query C@B's details endpoint for a single section.
+- **Semester IDs**: `seat_signal/utils.py` converts between C@B's semester IDs and labels like "Fall 2025".
